@@ -1,0 +1,36 @@
+[tool.poetry]
+name = "pitot"
+version = "0.1.0"
+description = "Toolbox for aeronautic units and conversions"
+authors = ["Xavier Olive <git@xoolive.org>", "Junzi Sun <junzisun@gmail.com>"]
+license = "MIT"
+readme = "readme.md"
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Information Technology",
+  "Intended Audience :: Science/Research",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: MacOS",
+  "Operating System :: POSIX :: Linux",
+  "Topic :: Software Development :: Libraries",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Typing :: Typed",
+]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+numpy = "^1.23.0"
+pandas = "^1.4.3"
+Pint = "^0.19.2"
+Pint-Pandas = "^0.2"
+
+[tool.poetry.dev-dependencies]
+mypy = "^0.961"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
