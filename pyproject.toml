@@ -20,6 +20,10 @@ classifiers = [
   "Programming Language :: Python :: 3.10",
   "Typing :: Typed",
 ]
+include = [
+  "license.txt",
+  "py.typed"
+]
 
 [tool.poetry.dependencies]
 python = "^3.8"
@@ -57,7 +61,6 @@ exclude = '''
 [tool.isort]
 line_length = 80
 profile = "black"
-known_first_party = ["numpy", "pandas", "pyproj", "shapely"]
 
 [tool.mypy]
 python_version = 3.8

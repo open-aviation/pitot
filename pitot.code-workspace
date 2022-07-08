@@ -11,12 +11,12 @@
 
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
-    "python.testing.pytestArgs": ["tests"]
-  },
-  "files.exclude": {
-    "dist/": true,
-    "build:": true,
-    "docs/_build": true,
-    "docs/node_modules": true
+    "python.testing.pytestArgs": ["tests"],
+    "files.exclude": {
+      "dist/": true,
+      "build:": true,
+      "docs/_build": true,
+      "docs/node_modules": true
+    }
   }
 }
