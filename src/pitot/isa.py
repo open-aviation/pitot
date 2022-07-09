@@ -14,6 +14,7 @@ _log = logging.getLogger(__name__)
 
 
 STRATOSPHERE_TEMP = Q_(216.65, u.K)  # until altitude = 22km
+SPECIFIC_GAS_CONSTANT = Q_(287.05287, u.J / u.kg / u.K)
 
 ReturnQuantity = Callable[..., pint.Quantity[Any]]
 
@@ -41,7 +42,27 @@ def default_units(**unit_kw: str | pint.Unit) -> Callable[..., ReturnQuantity]:
 
 @default_units(h=u.meter)
 def temperature(h: Any) -> pint.Quantity[Any]:
-    return np.maximum(  # type: ignore
+    temp = np.maximum(
         Q_(288.15, u.K) - Q_(0.0065, u.K / u.meter) * h,
         STRATOSPHERE_TEMP,
     )
+    return temp  # type: ignore
+
+
+@default_units(h=u.meter)
+def density(h: Any) -> pint.Quantity[Any]:
+    temp = temperature(h)
+    density_troposphere = (
+        Q_(1.225, u.kg / u.meter ** 3) * (temp / Q_(288.15, u.K)) ** 4.256848
+    )
+    delta = np.maximum(0, h - Q_(11000, u.meter))
+    density = density_troposphere * np.exp(-delta / Q_(6341.5522, u.meter))
+    return density  # type: ignore
+
+
+@default_units(h=u.meter)
+def pressure(h: Any) -> pint.Quantity[Any]:
+    temp = temperature(h)
+    den = density(h)
+    press = den * temp * SPECIFIC_GAS_CONSTANT
+    return press  # type: ignore
