@@ -2,10 +2,11 @@
 
 from typing import Union, overload
 
-import pint
-
 import numpy as np
 import numpy.typing as npt
+import pandas as pd
+import pint
+from pint_pandas import PintArray
 
 Scalar = Union[int, float, np.float_]
 QuantityOrScalar = Union[
@@ -15,7 +16,7 @@ QuantityOrScalar = Union[
     pint.Quantity[np.float_],
 ]
 Array = npt.NDArray[np.float_]
-QuantityOrArray = Union[Array, pint.Quantity[Array]]
+QuantityOrArray = Union[Array, pint.Quantity[Array], PintArray, pd.Series]
 
 @overload
 def temperature(h: QuantityOrScalar) -> pint.Quantity[Scalar]: ...

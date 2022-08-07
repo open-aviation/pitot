@@ -6,15 +6,19 @@ import logging
 from typing import Any, Callable
 
 import numpy as np
+import pandas as pd
 import pint
+from pint_pandas import PintArray, PintType
 
-from . import Q_, u
+from . import Q_, ureg
 
 _log = logging.getLogger(__name__)
 
+PintType.ureg = ureg
+PintType.ureg.default_format = "~P"
 
-STRATOSPHERE_TEMP = Q_(216.65, u.K)  # until altitude = 22km
-SPECIFIC_GAS_CONSTANT = Q_(287.05287, u.J / u.kg / u.K)
+STRATOSPHERE_TEMP = Q_(216.65, ureg.K)  # until altitude = 22km
+SPECIFIC_GAS_CONSTANT = Q_(287.05287, ureg.J / ureg.kg / ureg.K)
 
 ReturnQuantity = Callable[..., pint.Quantity[Any]]
 
@@ -29,9 +33,23 @@ def default_units(**unit_kw: str | pint.Unit) -> Callable[..., ReturnQuantity]:
             new_args = dict(bind_args.arguments)
             for arg, value in new_args.items():
                 unit = unit_kw.get(arg, None)
-                if unit is not None and not isinstance(arg, pint.Quantity):
-                    _log.warning(msg.format(arg=arg, unit=unit))
-                    new_args[arg] = Q_(value, unit)
+
+                if (
+                    unit is None
+                    or isinstance(value, pint.Quantity)
+                    or isinstance(value, PintArray)
+                ):
+                    continue
+
+                if isinstance(value, pd.Series):
+                    if isinstance(value.dtype, PintType):
+                        new_args[arg] = value.values
+                        continue
+                    else:
+                        value = value.values
+
+                _log.warning(msg.format(arg=arg, unit=unit))
+                new_args[arg] = Q_(value, unit)
 
             return fun(**new_args)
 
@@ -40,29 +58,32 @@ def default_units(**unit_kw: str | pint.Unit) -> Callable[..., ReturnQuantity]:
     return wrapper
 
 
-@default_units(h=u.meter)
+@default_units(h=ureg.meter)
 def temperature(h: Any) -> pint.Quantity[Any]:
     temp = np.maximum(
-        Q_(288.15, u.K) - Q_(0.0065, u.K / u.meter) * h,
+        Q_(288.15, ureg.K) - Q_(0.0065, ureg.K / ureg.meter) * h,
         STRATOSPHERE_TEMP,
     )
     return temp  # type: ignore
 
 
-@default_units(h=u.meter)
+@default_units(h=ureg.meter)
 def density(h: Any) -> pint.Quantity[Any]:
     temp = temperature(h)
     density_troposphere = (
-        Q_(1.225, u.kg / u.meter ** 3) * (temp / Q_(288.15, u.K)) ** 4.256848
+        Q_(1.225, ureg.kg / ureg.meter**3)
+        * (temp / Q_(288.15, ureg.K)) ** 4.256848
     )
-    delta = np.maximum(0, h - Q_(11000, u.meter))
-    density = density_troposphere * np.exp(-delta / Q_(6341.5522, u.meter))
-    return density  # type: ignore
+    delta = np.maximum(Q_(0, ureg.meter), h - Q_(11000, ureg.meter))
+    density: pint.Quantity[Any] = density_troposphere * np.exp(
+        -delta / Q_(6341.5522, ureg.meter)
+    )
+    return density
 
 
-@default_units(h=u.meter)
+@default_units(h=ureg.meter)
 def pressure(h: Any) -> pint.Quantity[Any]:
     temp = temperature(h)
     den = density(h)
-    press = den * temp * SPECIFIC_GAS_CONSTANT
-    return press  # type: ignore
+    press: pint.Quantity[Any] = den * temp * SPECIFIC_GAS_CONSTANT
+    return press
