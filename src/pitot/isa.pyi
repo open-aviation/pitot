@@ -18,15 +18,18 @@ QuantityOrScalar = Union[
 Array = npt.NDArray[np.float_]
 QuantityOrArray = Union[Array, pint.Quantity[Array], PintArray, pd.Series]
 
+# The `type: ignore` instructions below are necessary as long as mypy sees
+# PintArray and pd.Series as Any.
+
 @overload
-def temperature(h: QuantityOrScalar) -> pint.Quantity[Scalar]: ...
+def temperature(h: QuantityOrScalar) -> pint.Quantity[Scalar]: ...  # type: ignore
 @overload
 def temperature(h: QuantityOrArray) -> pint.Quantity[Array]: ...
 @overload
-def density(h: QuantityOrScalar) -> pint.Quantity[Scalar]: ...
+def density(h: QuantityOrScalar) -> pint.Quantity[Scalar]: ...  # type: ignore
 @overload
 def density(h: QuantityOrArray) -> pint.Quantity[Array]: ...
 @overload
-def pressure(h: QuantityOrScalar) -> pint.Quantity[Scalar]: ...
+def pressure(h: QuantityOrScalar) -> pint.Quantity[Scalar]: ...  # type: ignore
 @overload
 def pressure(h: QuantityOrArray) -> pint.Quantity[Array]: ...
