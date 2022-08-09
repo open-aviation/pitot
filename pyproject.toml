@@ -31,6 +31,7 @@ numpy = "^1.23.0"
 pandas = "^1.4.3"
 Pint = "^0.19.2"
 Pint-Pandas = "^0.2"
+typing-extensions = "^4.3.0"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.961"
@@ -81,4 +82,7 @@ warn_unused_ignores = true
 
 [tool.pytest.ini_options]
 addopts = "--log-level=DEBUG --color=yes"
+filterwarnings = [
+  "ignore:.*unit of the quantity is strip.*:"
+]
 testpaths = ["tests"]

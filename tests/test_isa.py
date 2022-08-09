@@ -1,145 +1,67 @@
-import numpy as np
+from pathlib import Path
+from typing import TYPE_CHECKING
+
 import pandas as pd
+import pint
 import pytest
 
-from pitot import Q_, ureg
-from pitot.isa import density, pressure, temperature
+from pitot import Q_, isa, ureg
+from pitot.types import Array
 
-altitudes = np.array([0, 1000, 3000, 15000, 30000])
+if TYPE_CHECKING:
+    from pitot.isa import ISA_Method
 
 
-def test_temperature() -> None:
-    # value with unit
-    r1 = temperature(Q_(0, ureg.m))
-    assert r1.m == pytest.approx(288.15)
-
-    # value without unit
-    r2 = temperature(0)
-    assert r2.m == pytest.approx(288.15)
-
-    # value array as unit
-    r3 = temperature(Q_(altitudes, ureg.ft))
-    assert np.allclose(
-        r3,
-        np.array([288.15, 286.17, 282.21, 258.43, 228.71]) * ureg.K,
-        rtol=1e-2,
-    )
-
-    # regular numpy array
-    r4 = temperature(0.3048 * altitudes)
-    assert np.allclose(
-        r4,
-        np.array([288.15, 286.17, 282.21, 258.43, 228.71]) * ureg.K,
-        rtol=1e-2,
-    )
-
-    # pandas Series with unit
-    r5 = temperature(pd.Series([0, 1000, 3000, 15000, 30000], dtype="pint[ft]"))
-    assert np.allclose(
-        r5,
-        np.array([288.15, 286.17, 282.21, 258.43, 228.71]) * ureg.K,
-        rtol=1e-2,
-    )
-
-    # pandas Series without unit
-    r6 = temperature(0.3048 * pd.Series(altitudes))
-    assert np.allclose(
-        r6,
-        np.array([288.15, 286.17, 282.21, 258.43, 228.71]) * ureg.K,
-        rtol=1e-2,
+@pytest.fixture
+def isa_table() -> pd.DataFrame:
+    return (
+        pd.read_fwf(Path(__file__).parent / "isa_table.txt", header=[0, 1])
+        .pint.quantify(level=-1)
+        .assign(density=lambda df: isa.RHO_0 * df.density_ratio)  # type: ignore
     )
 
 
-def test_density() -> None:
-    # value with unit
-    r1 = density(Q_(0, ureg.m))
-    assert r1.m == pytest.approx(1.225)
-
-    # value without unit
-    r2 = density(0)
-    assert r2.m == pytest.approx(1.225)
-
-    # value array as unit
-    r3 = density(Q_(altitudes, ureg.ft))
-    assert np.allclose(
-        r3,
-        np.array([1.2250, 1.1896, 1.1210, 0.7708, 0.4583])
-        * ureg.kg
-        / ureg.meter**3,
-        rtol=1e-2,
-    )
-
-    # regular numpy array
-    r4 = density(0.3048 * altitudes)
-    assert np.allclose(
-        r4,
-        np.array([1.2250, 1.1896, 1.1210, 0.7708, 0.4583])
-        * ureg.kg
-        / ureg.meter**3,
-        rtol=1e-2,
-    )
-
-    # pandas Series with unit
-    r5 = density(pd.Series([0, 1000, 3000, 15000, 30000], dtype="pint[ft]"))
-    assert np.allclose(
-        r5,
-        np.array([1.2250, 1.1896, 1.1210, 0.7708, 0.4583])
-        * ureg.kg
-        / ureg.meter**3,
-        rtol=1e-2,
-    )
-
-    # pandas Series without unit
-    r6 = density(0.3048 * pd.Series(altitudes))
-    assert np.allclose(
-        r6,
-        np.array([1.2250, 1.1896, 1.1210, 0.7708, 0.4583])
-        * ureg.kg
-        / ureg.meter**3,
-        rtol=1e-2,
-    )
+@pytest.fixture
+def zero_values(isa_table: pd.DataFrame) -> pd.Series:
+    return isa_table.query("altitude == 0").iloc[0]
 
 
-def test_pressure() -> None:
-    # value with unit
-    r1 = pressure(Q_(0, ureg.m))
-    assert r1.m == pytest.approx(101325)
+@pytest.mark.parametrize(
+    "quantity,method",
+    [
+        ("density", isa.density),
+        ("pressure", isa.pressure),
+        ("sound_speed", isa.sound_speed),
+        ("temperature", isa.temperature),
+    ],
+)
+def test_quantity(
+    quantity: str,
+    method: "ISA_Method",
+    isa_table: pd.DataFrame,
+    zero_values: pd.Series,
+) -> None:
 
-    # check non-SI equivalent
-    assert (r1 - Q_(2116.2, ureg.lbf / ureg.ft**2)).m < 1  # 1 Pa
+    # this is a regular NumPy array with altitudes in feet
+    altitude_ft: Array = isa_table.pint.dequantify().altitude.ft.values
+    expected: pint.Quantity[Array] = isa_table[quantity].values.quantity
 
-    # value without unit
-    r2 = pressure(0)
-    assert r2.m == pytest.approx(101325)
+    r1 = method(Q_(0, ureg.m))  # value with unit
+    assert r1.m == pytest.approx(zero_values[quantity].to(r1.u).m, rel=1e-2)
 
-    # value array as unit
-    r3 = pressure(Q_(altitudes, ureg.ft))
-    assert np.allclose(
-        r3,
-        np.array([101325, 97717, 90812, 57182, 30090]) * ureg.N / ureg.m**2,
-        rtol=1e-2,
-    )
+    r2 = method(0)  # value without unit
+    assert r2.m == pytest.approx(zero_values[quantity].to(r2.u).m, rel=1e-2)
 
-    # regular numpy array
-    r4 = pressure(0.3048 * altitudes)
-    assert np.allclose(
-        r4,
-        np.array([101325, 97717, 90812, 57182, 30090]) * ureg.N / ureg.m**2,
-        rtol=1e-2,
-    )
+    r3 = method(Q_(altitude_ft, ureg.ft))  # numpy array with unit
+    assert r3.m == pytest.approx(expected.to(r3.u).m, rel=1e-2)
 
-    # pandas Series with unit
-    r5 = pressure(pd.Series([0, 1000, 3000, 15000, 30000], dtype="pint[ft]"))
-    assert np.allclose(
-        r5,
-        np.array([101325, 97717, 90812, 57182, 30090]) * ureg.N / ureg.m**2,
-        rtol=1e-2,
-    )
+    r4 = method(0.3048 * altitude_ft)  # regular numpy array
+    assert r4.m == pytest.approx(expected.to(r4.u).m, rel=1e-2)
 
-    # pandas Series without unit
-    r6 = pressure(0.3048 * pd.Series(altitudes))
-    assert np.allclose(
-        r6,
-        np.array([101325, 97717, 90812, 57182, 30090]) * ureg.N / ureg.m**2,
-        rtol=1e-2,
-    )
+    # TODO: both r5 and r6 are seen as Any
+    # see comment in types.py
+    r5 = method(isa_table["altitude"])  # pandas Series with unit
+    assert r5.m == pytest.approx(expected.to(r5.u).m, rel=1e-2)
+
+    r6 = method(0.3048 * pd.Series(altitude_ft))  # pandas Series without unit
+    assert r6.m == pytest.approx(expected.to(r6.u).m, rel=1e-2)

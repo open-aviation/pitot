@@ -1,35 +1,19 @@
 # flake8: noqa
 
-from typing import Union, overload
+from typing import List, Union, overload
 
-import numpy as np
-import numpy.typing as npt
-import pandas as pd
 import pint
-from pint_pandas import PintArray
+from typing_extensions import Protocol
 
-Scalar = Union[int, float, np.float_]
-QuantityOrScalar = Union[
-    Scalar,
-    pint.Quantity[int],
-    pint.Quantity[float],
-    pint.Quantity[np.float_],
-]
-Array = npt.NDArray[np.float_]
-QuantityOrArray = Union[Array, pint.Quantity[Array], PintArray, pd.Series]
+from .types import Scalar, Array, QuantityOrArray, QuantityOrScalar
 
-# The `type: ignore` instructions below are necessary as long as mypy sees
-# PintArray and pd.Series as Any.
+class ISA_Method(Protocol):
+    @overload
+    def __call__(self, h: QuantityOrArray) -> pint.Quantity[Array]: ...
+    @overload
+    def __call__(self, h: QuantityOrScalar) -> pint.Quantity[Scalar]: ...
 
-@overload
-def temperature(h: QuantityOrScalar) -> pint.Quantity[Scalar]: ...  # type: ignore
-@overload
-def temperature(h: QuantityOrArray) -> pint.Quantity[Array]: ...
-@overload
-def density(h: QuantityOrScalar) -> pint.Quantity[Scalar]: ...  # type: ignore
-@overload
-def density(h: QuantityOrArray) -> pint.Quantity[Array]: ...
-@overload
-def pressure(h: QuantityOrScalar) -> pint.Quantity[Scalar]: ...  # type: ignore
-@overload
-def pressure(h: QuantityOrArray) -> pint.Quantity[Array]: ...
+temperature: ISA_Method
+density: ISA_Method
+pressure: ISA_Method
+sound_speed: ISA_Method
