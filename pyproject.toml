@@ -32,6 +32,7 @@ pandas = "^1.4.3"
 Pint = "^0.19.2"
 Pint-Pandas = "^0.2"
 typing-extensions = "^4.3.0"
+pyproj = "^3.3.1"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.961"
