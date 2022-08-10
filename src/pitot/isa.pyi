@@ -2,6 +2,7 @@
 
 from typing import Tuple, overload
 
+import pandas as pd
 import pint
 from typing_extensions import Protocol
 
@@ -12,6 +13,8 @@ class ISA_Method(Protocol):
     def __call__(self, h: QuantityOrArray) -> pint.Quantity[Array]: ...
     @overload
     def __call__(self, h: QuantityOrScalar) -> pint.Quantity[Scalar]: ...
+    @overload
+    def __call__(self, h: pd.Series) -> pd.Series: ...
 
 GAMMA: pint.Quantity[float]
 P_0: pint.Quantity[float]

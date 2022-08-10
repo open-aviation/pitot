@@ -72,7 +72,7 @@ It is preferable to avoid warnings by passing values with a physical unit:
 <Quantity([15.     13.0188], 'degree_Celsius')>
 ```
 
-Things also works with NumPy arrays...
+Things also work with NumPy arrays...
 
 ```pycon
 >>> import numpy as np

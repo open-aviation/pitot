@@ -22,6 +22,7 @@ def default_units(**unit_kw: str | pint.Unit) -> Callable[..., ReturnQuantity]:
 
         @functools.wraps(fun)
         def decorated_func(*args: Any, **kwargs: Any) -> pint.Quantity[Any]:
+            return_pandas = False
             bind_args = inspect.signature(fun).bind(*args, **kwargs)
             new_args = dict(bind_args.arguments)
             for arg, value in new_args.items():
@@ -35,6 +36,7 @@ def default_units(**unit_kw: str | pint.Unit) -> Callable[..., ReturnQuantity]:
                     continue
 
                 if isinstance(value, pd.Series):
+                    return_pandas = True
                     if isinstance(value.dtype, PintType):
                         new_args[arg] = value.values
                         continue
@@ -44,7 +46,13 @@ def default_units(**unit_kw: str | pint.Unit) -> Callable[..., ReturnQuantity]:
                 _log.warning(msg.format(arg=arg, unit=unit))
                 new_args[arg] = Q_(value, unit)
 
-            return fun(**new_args)
+            res = fun(**new_args)
+
+            if return_pandas and isinstance(res, pint.Quantity):
+                array = PintArray.from_1darray_quantity(res)
+                return pd.Series(array)  # type: ignore
+
+            return res
 
         return decorated_func
 

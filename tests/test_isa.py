@@ -58,10 +58,12 @@ def test_quantity(
     r4 = method(0.3048 * altitude_ft)  # regular numpy array
     assert r4.m == pytest.approx(expected.to(r4.u).m, rel=1e-2)
 
-    # TODO: both r5 and r6 are seen as Any
-    # see comment in types.py
     r5 = method(isa_table["altitude"])  # pandas Series with unit
-    assert r5.m == pytest.approx(expected.to(r5.u).m, rel=1e-2)
+    assert r5.values.quantity.m == pytest.approx(
+        expected.to(r5.dtype.units).m, rel=1e-2
+    )
 
     r6 = method(0.3048 * pd.Series(altitude_ft))  # pandas Series without unit
-    assert r6.m == pytest.approx(expected.to(r6.u).m, rel=1e-2)
+    assert r6.values.quantity.m == pytest.approx(
+        expected.to(r6.dtype.units).m, rel=1e-2
+    )
