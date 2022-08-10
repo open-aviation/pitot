@@ -24,3 +24,70 @@ The following functions are currently available:
 - International Standard Atmosphere (temperature, density, pressure and speed of sound);
 - conversions between various air speeds: CAS, TAS, EAS and Mach number;
 - geodetic calculations (distance, bearing, great circle, etc.) on a WGS84 ellipsoid.
+
+## Installation
+
+### Latest release
+
+```sh
+pip install pitot
+```
+
+### Development version
+
+```sh
+poetry install
+```
+
+## Basic usage
+
+Physical units are not mandatory for arguments, but return values are all [`pint`](https://pint.readthedocs.io/) quantities
+
+```pycon
+>>> from pitot.isa import temperature
+>>> temperature(0)
+Input argument 'h' will be considered as 'm'
+<Quantity(288.15, 'kelvin')>
+>>> temperature([0, 1000])
+Input argument 'h' will be considered as 'm'
+<Quantity([288.15 281.65], 'kelvin')>
+```
+
+You may access the value with the `m` (stands for _magnitude_) attribute:
+
+```pycon
+>>> temperature(0).m  # in Kelvin by default
+Input argument 'h' will be considered as 'm'
+288.15
+>>> temperature(0).to("°C").m
+Input argument 'h' will be considered as 'm'
+15.0
+```
+
+It is preferable to avoid warnings by passing values with a physical unit:
+
+```pycon
+>>> from pitot import Q_
+>>> temperature(Q_([0, 1000], "ft")).to("°C")
+<Quantity([15.     13.0188], 'degree_Celsius')>
+```
+
+Things also works with NumPy arrays...
+
+```pycon
+>>> import numpy as np
+>>> temperature(Q_(np.array([0, 1000]), "ft"))
+<Quantity([288.15   286.1688], 'kelvin')>
+>>> temperature(Q_(np.array([0, 1000]), "ft")).to("°C").m
+array([15.    , 13.0188])
+```
+
+... or with Pandas Series:
+
+```pycon
+>>> import pandas as pd
+>>> temperature(pd.Series([0., 1000], dtype="pint[ft]")).pint.to("°C")
+0                  15.0
+1    13.018799999999999
+dtype: pint[°C]
+```
