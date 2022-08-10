@@ -17,7 +17,7 @@ def isa_table() -> pd.DataFrame:
     return (
         pd.read_fwf(Path(__file__).parent / "isa_table.txt", header=[0, 1])
         .pint.quantify(level=-1)
-        .assign(density=lambda df: isa.RHO_0 * df.density_ratio)  # type: ignore
+        .assign(density=lambda df: isa.RHO_0 * df.density_ratio)
     )
 
 
