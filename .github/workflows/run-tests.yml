@@ -55,6 +55,10 @@ jobs:
       - name: Display Python version
         run: poetry run python -c "import sys; print(sys.version)"
 
+      - name: Install dependencies
+        run: |
+          poetry install
+
       - name: Style checking
         if: ${{ matrix.python-version == '3.10' }}
         run: |
