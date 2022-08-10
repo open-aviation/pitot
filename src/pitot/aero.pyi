@@ -1,7 +1,8 @@
 # flake8: noqa
 
-from typing import Tuple, overload
+from typing import overload
 
+import pandas as pd
 import pint
 from typing_extensions import Protocol
 
@@ -24,6 +25,16 @@ class AeroMethod(Protocol):
     def __call__(
         self, _: QuantityOrScalar, h: QuantityOrScalar
     ) -> pint.Quantity[Scalar]: ...
+    @overload
+    def __call__(self, _: QuantityOrScalar, h: pd.Series) -> pd.Series: ...
+    @overload
+    def __call__(self, _: QuantityOrArray, h: pd.Series) -> pd.Series: ...
+    @overload
+    def __call__(self, _: pd.Series, h: QuantityOrScalar) -> pd.Series: ...
+    @overload
+    def __call__(self, _: pd.Series, h: QuantityOrArray) -> pd.Series: ...
+    @overload
+    def __call__(self, _: pd.Series, h: pd.Series) -> pd.Series: ...
 
 tas2mach: AeroMethod
 mach2tas: AeroMethod
