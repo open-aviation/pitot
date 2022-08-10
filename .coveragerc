@@ -1,6 +1,6 @@
 [run]
 branch = True
-include = */src/*
+omit = tests/*
 
 [report]
 exclude_lines =
