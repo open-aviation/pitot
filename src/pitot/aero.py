@@ -28,7 +28,7 @@ def tas2mach(tas: Any, h: Any) -> pint.Quantity[Any]:
     """
     a = sound_speed(h)
     M = tas / a
-    return M  # type: ignore
+    return M.to("dimensionless")  # type: ignore
 
 
 @default_units(M="dimensionless", h="ft")
@@ -123,4 +123,4 @@ def cas2mach(cas: Any, h: Any) -> pint.Quantity[Any]:
     """
     tas = cas2tas(cas, h)
     M = tas2mach(tas, h)
-    return M
+    return M.to("dimensionless")

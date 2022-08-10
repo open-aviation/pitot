@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Sequence, Union
 
 import numpy as np
 import numpy.typing as npt
@@ -16,4 +16,4 @@ QuantityOrScalar = Union[
 Array = npt.NDArray[np.float_]
 
 # It is still difficult to include PintArray as they are seen as `Any`.
-QuantityOrArray = Union[Array, pint.Quantity[Array]]
+QuantityOrArray = Union[Sequence[float], Array, pint.Quantity[Array]]
