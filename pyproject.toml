@@ -62,6 +62,7 @@ exclude = '''
 [tool.isort]
 line_length = 80
 profile = "black"
+skip = ["*.pyi"]
 
 [tool.mypy]
 python_version = 3.8
