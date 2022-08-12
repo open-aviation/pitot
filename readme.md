@@ -46,10 +46,10 @@ Physical units are not mandatory for arguments, but return values are all [`pint
 ```pycon
 >>> from pitot.isa import temperature
 >>> temperature(0)
-Input argument 'h' will be considered as 'm'
+Default unit [m] will be used for argument 'h'.
 <Quantity(288.15, 'kelvin')>
 >>> temperature([0, 1000])
-Input argument 'h' will be considered as 'm'
+Default unit [m] will be used for argument 'h'.
 <Quantity([288.15 281.65], 'kelvin')>
 ```
 
@@ -57,10 +57,10 @@ You may access the value with the `m` (stands for _magnitude_) attribute:
 
 ```pycon
 >>> temperature(0).m  # in Kelvin by default
-Input argument 'h' will be considered as 'm'
+Default unit [m] will be used for argument 'h'.
 288.15
 >>> temperature(0).to("°C").m
-Input argument 'h' will be considered as 'm'
+Default unit [m] will be used for argument 'h'.
 15.0
 ```
 

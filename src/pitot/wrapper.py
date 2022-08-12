@@ -18,7 +18,7 @@ _log = logging.getLogger(__name__)
 
 def default_units(**unit_kw: str | pint.Unit) -> Callable[..., ReturnQuantity]:
     def wrapper(fun: ReturnQuantity) -> ReturnQuantity:
-        msg = "Input argument '{arg}' will be considered as '{unit}'"
+        msg = "Default unit [{unit}] will be used for argument '{arg}'."
 
         @functools.wraps(fun)
         def decorated_func(*args: Any, **kwargs: Any) -> pint.Quantity[Any]:
