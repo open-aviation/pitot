@@ -27,6 +27,12 @@ repos:
     rev: 5.10.1
     hooks:
       - id: isort
+        name: "isort (python)"
+        types: [python]
+      - id: isort
+        name: "isort (pyi)"
+        types: [pyi]
+        args: [--lines-after-imports, "-1"]
   - repo: https://github.com/pycqa/flake8
     rev: 4.0.1
     hooks:
