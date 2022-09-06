@@ -91,3 +91,19 @@ array([15.    , 13.0188])
 1    13.018799999999999
 dtype: pint[°C]
 ```
+
+## Contributions
+
+Any input, feedback, bug report or contribution is welcome.
+
+Before opening a PR, please check your commits follow a number of safeguards with hooks to install as follow:
+
+```sh
+poetry run pre-commit install
+```
+
+Then you should prefix you `git commit` commands as follow:
+
+```sh
+poetry run git commit -m "fantastic commit message"
+```
