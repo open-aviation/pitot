@@ -69,12 +69,12 @@ def pressure(h: Any) -> pint.Quantity[Any]:
     """
     temp = temperature(h)
     temp_0 = temperature(0)
-    dT = np.maximum(Q_(0, "m"), h - H_TROP)
+    delta = np.maximum(Q_(0, "m"), h - H_TROP)
 
     press: pint.Quantity[Any] = np.where(
         h < H_TROP,
         P_0 * (temp / temp_0) ** (-G_0 / (BETA_T * R)),
-        TROPOPAUSE_PRESS * np.exp(-G_0 / (R * STRATOSPHERE_TEMP) * dT),
+        TROPOPAUSE_PRESS * np.exp(-G_0 / (R * STRATOSPHERE_TEMP) * delta),
     )
     return press
 
@@ -100,7 +100,12 @@ def atmosphere(
     den: pint.Quantity[Any] = density_troposphere * np.exp(
         -delta / Q_(6341.5522, "m")
     )
-    press: pint.Quantity[Any] = den * temp * SPECIFIC_GAS_CONSTANT
+    temp_0 = temperature(0)
+    press: pint.Quantity[Any] = np.where(
+        h < H_TROP,
+        P_0 * (temp / temp_0) ** (-G_0 / (BETA_T * R)),
+        TROPOPAUSE_PRESS * np.exp(-G_0 / (R * STRATOSPHERE_TEMP) * delta),
+    )
     return press, den, temp
 
 
