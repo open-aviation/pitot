@@ -15,6 +15,8 @@ R = Q_(287.05287, "m^2 / (s^2 * K)")  # gas constant, sea level ISA
 RHO_0 = Q_(1.225, "kg / m^3")  # sea level density ISA
 SPECIFIC_GAS_CONSTANT = Q_(287.05287, "J/kg/K")
 STRATOSPHERE_TEMP = Q_(216.65, "K")  # until altitude = 22km
+G_0 = Q_(9.80665, "m / s^2")  # Gravitational acceleration
+BETA_T = Q_(-0.0065, "K / m")  # Temperature gradient below tropopause, ISA
 
 
 @default_units(h=ureg.meter)
@@ -64,8 +66,8 @@ def pressure(h: Any) -> pint.Quantity[Any]:
 
     """
     temp = temperature(h)
-    den = density(h)
-    press: pint.Quantity[Any] = den * temp * SPECIFIC_GAS_CONSTANT
+    temp_0 = temperature(0)
+    press: pint.Quantity[Any] = P_0 * (temp / temp_0) ** (-G_0 / BETA_T * R)
     return press
 
 
