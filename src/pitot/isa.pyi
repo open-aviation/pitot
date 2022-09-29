@@ -22,6 +22,10 @@ R: pint.Quantity[float]
 RHO_0: pint.Quantity[float]
 SPECIFIC_GAS_CONSTANT: pint.Quantity[float]
 STRATOSPHERE_TEMP: pint.Quantity[float]
+G_0: pint.Quantity[float]
+BETA_T: pint.Quantity[float]
+TROPOPAUSE_PRESS: pint.Quantity[float]
+H_TROP: pint.Quantity[float]
 
 temperature: ISA_Method
 density: ISA_Method
