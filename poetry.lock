@@ -223,8 +223,8 @@ python-versions = ">=3.8"
 
 [package.dependencies]
 numpy = [
-    {version = ">=1.21.0", markers = "python_version >= \"3.10\""},
     {version = ">=1.20.3", markers = "python_version < \"3.10\""},
+    {version = ">=1.21.0", markers = "python_version >= \"3.10\""},
 ]
 python-dateutil = ">=2.8.1"
 pytz = ">=2020.1"
@@ -242,16 +242,20 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "pint"
-version = "0.19.2"
+version = "0.20.1"
 description = "Physical quantities module"
 category = "main"
 optional = false
 python-versions = ">=3.8"
 
 [package.extras]
+babel = ["babel (<=2.8)"]
+dask = ["dask"]
 numpy = ["numpy (>=1.19.5)"]
+pandas = ["pint-pandas (>=0.3)"]
 test = ["pytest", "pytest-cov", "pytest-mpl", "pytest-subtests"]
 uncertainties = ["uncertainties (>=3.1.6)"]
+xarray = ["xarray"]
 
 [[package]]
 name = "pint-pandas"
@@ -481,7 +485,7 @@ testing = ["coverage (>=6.2)", "coverage-enable-subprocess (>=1)", "flaky (>=3.7
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "ea11a4c431f08dcf8c1c19f60b6807112126ef45df3b377fcaeaca7f6262ec23"
+content-hash = "ec08c294b8cade3fa4e7bbd91ba6c00f29518e1533a3fbbb73bb64fda50372ec"
 
 [metadata.files]
 attrs = [
@@ -709,7 +713,8 @@ pathspec = [
     {file = "pathspec-0.10.1.tar.gz", hash = "sha256:7ace6161b621d31e7902eb6b5ae148d12cfd23f4a249b9ffb6b9fee12084323d"},
 ]
 pint = [
-    {file = "Pint-0.19.2.tar.gz", hash = "sha256:e1d4989ff510b378dad64f91711e7bdabe5ca78d75b06a18569ac454678c4baf"},
+    {file = "Pint-0.20.1-py3-none-any.whl", hash = "sha256:68afe65665542ee3ec99f69f043b1d39bfe7c6d61b786940157138fd08b838fb"},
+    {file = "Pint-0.20.1.tar.gz", hash = "sha256:387cf04078dc7dfe4a708033baad54ab61d82ab06c4ee3d4922b1e45d5626067"},
 ]
 pint-pandas = [
     {file = "Pint-Pandas-0.2.tar.gz", hash = "sha256:6f60d2e80ac102e0f94addb9206e0f6cca5ee42f0b7f8930d8c798002e41fa87"},
