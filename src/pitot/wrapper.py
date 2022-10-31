@@ -11,7 +11,7 @@ from pint_pandas import PintArray, PintType
 
 from . import Q_
 
-ReturnQuantity = Callable[..., pint.Quantity[Any]]
+ReturnQuantity = Callable[..., pint.Quantity]
 
 _log = logging.getLogger(__name__)
 
@@ -21,7 +21,7 @@ def default_units(**unit_kw: str | pint.Unit) -> Callable[..., ReturnQuantity]:
         msg = "Default unit [{unit}] will be used for argument '{arg}'."
 
         @functools.wraps(fun)
-        def decorated_func(*args: Any, **kwargs: Any) -> pint.Quantity[Any]:
+        def decorated_func(*args: Any, **kwargs: Any) -> pint.Quantity:
             return_pandas = False
             bind_args = inspect.signature(fun).bind(*args, **kwargs)
             new_args = dict(bind_args.arguments)
@@ -50,7 +50,7 @@ def default_units(**unit_kw: str | pint.Unit) -> Callable[..., ReturnQuantity]:
 
             if return_pandas and isinstance(res, pint.Quantity):
                 array = PintArray.from_1darray_quantity(res)
-                return pd.Series(array)  # type: ignore
+                return pd.Series(array)
 
             return res
 

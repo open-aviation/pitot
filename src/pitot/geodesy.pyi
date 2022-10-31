@@ -14,7 +14,7 @@ def distance(
     lon2: float,
     *args: Any,
     **kwargs: Any,
-) -> pint.Quantity[float]: ...
+) -> pint.Quantity: ...
 @overload
 def distance(
     lat1: Sequence[float] | Array,
@@ -23,7 +23,7 @@ def distance(
     lon2: Sequence[float] | Array,
     *args: Any,
     **kwargs: Any,
-) -> pint.Quantity[Array]: ...
+) -> pint.Quantity: ...
 @overload
 def bearing(
     lat1: float,

@@ -9,42 +9,27 @@ from typing_extensions import Protocol
 from .types import Array, QuantityOrArray, QuantityOrScalar, Scalar
 
 class ISA_Method(Protocol):
-    @overload
-    def __call__(self, h: QuantityOrArray) -> pint.Quantity[Array]: ...
-    @overload
-    def __call__(self, h: QuantityOrScalar) -> pint.Quantity[Scalar]: ...
-    @overload
-    def __call__(self, h: pd.Series) -> pd.Series: ...
+    # @overload
+    def __call__(self, h: QuantityOrArray) -> pint.Quantity: ...
+    # @overload
+    # def __call__(self, h: pd.Series) -> pd.Series: ...
 
-GAMMA: pint.Quantity[float]
-P_0: pint.Quantity[float]
-R: pint.Quantity[float]
-RHO_0: pint.Quantity[float]
-SPECIFIC_GAS_CONSTANT: pint.Quantity[float]
-STRATOSPHERE_TEMP: pint.Quantity[float]
-G_0: pint.Quantity[float]
-BETA_T: pint.Quantity[float]
-TROPOPAUSE_PRESS: pint.Quantity[float]
-H_TROP: pint.Quantity[float]
+GAMMA: pint.Quantity
+P_0: pint.Quantity
+R: pint.Quantity
+RHO_0: pint.Quantity
+SPECIFIC_GAS_CONSTANT: pint.Quantity
+STRATOSPHERE_TEMP: pint.Quantity
+G_0: pint.Quantity
+BETA_T: pint.Quantity
+TROPOPAUSE_PRESS: pint.Quantity
+H_TROP: pint.Quantity
 
 temperature: ISA_Method
 density: ISA_Method
 pressure: ISA_Method
 sound_speed: ISA_Method
 
-@overload
 def atmosphere(
     h: QuantityOrArray,
-) -> Tuple[
-    pint.Quantity[Array],
-    pint.Quantity[Array],
-    pint.Quantity[Array],
-]: ...
-@overload
-def atmosphere(
-    h: QuantityOrScalar,
-) -> Tuple[
-    pint.Quantity[Scalar],
-    pint.Quantity[Scalar],
-    pint.Quantity[Scalar],
-]: ...
+) -> Tuple[pint.Quantity, pint.Quantity, pint.Quantity,]: ...

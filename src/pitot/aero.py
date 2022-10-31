@@ -19,7 +19,7 @@ __all__ = [
 
 
 @default_units(tas="kts", h="ft")
-def tas2mach(tas: Any, h: Any) -> pint.Quantity[Any]:
+def tas2mach(tas: Any, h: Any) -> pint.Quantity:
     """
     :param tas: True Air Speed, (by default in kts)
     :param h: altitude, (by default in ft)
@@ -28,11 +28,11 @@ def tas2mach(tas: Any, h: Any) -> pint.Quantity[Any]:
     """
     a = sound_speed(h)
     M = tas / a
-    return M.to("dimensionless")  # type: ignore
+    return M.to("dimensionless")
 
 
 @default_units(M="dimensionless", h="ft")
-def mach2tas(M: Any, h: Any) -> pint.Quantity[Any]:
+def mach2tas(M: Any, h: Any) -> pint.Quantity:
     """
     :param M: Mach number (dimensionless)
     :param h: altitude, (by default in ft)
@@ -41,11 +41,11 @@ def mach2tas(M: Any, h: Any) -> pint.Quantity[Any]:
     """
     a = sound_speed(h)
     tas = M * a
-    return tas.to("kts")  # type: ignore
+    return tas.to("kts")
 
 
 @default_units(eas="kts", h="ft")
-def eas2tas(eas: Any, h: Any) -> pint.Quantity[Any]:
+def eas2tas(eas: Any, h: Any) -> pint.Quantity:
     """
     :param eas: Equivalent Air Speed, (by default in kts)
     :param h: altitude, (by default in ft)
@@ -54,11 +54,11 @@ def eas2tas(eas: Any, h: Any) -> pint.Quantity[Any]:
     """
     rho = density(h)
     tas = eas * np.sqrt(RHO_0 / rho)
-    return tas.to("kts")  # type: ignore
+    return tas.to("kts")
 
 
 @default_units(tas="kts", h="ft")
-def tas2eas(tas: Any, h: Any) -> pint.Quantity[Any]:
+def tas2eas(tas: Any, h: Any) -> pint.Quantity:
     """
     :param tas: True Air Speed, (by default in kts)
     :param h: altitude, (by default in ft)
@@ -67,11 +67,11 @@ def tas2eas(tas: Any, h: Any) -> pint.Quantity[Any]:
     """
     rho = density(h)
     eas = tas * np.sqrt(rho / RHO_0)
-    return eas.to("kts")  # type: ignore
+    return eas.to("kts")
 
 
 @default_units(cas="kts", h="ft")
-def cas2tas(cas: Any, h: Any) -> pint.Quantity[Any]:
+def cas2tas(cas: Any, h: Any) -> pint.Quantity:
     """
     :param cas: Computed Air Speed, (by default in kts)
     :param h: altitude, (by default in ft)
@@ -82,11 +82,11 @@ def cas2tas(cas: Any, h: Any) -> pint.Quantity[Any]:
     qdyn = P_0 * ((1.0 + RHO_0 * cas * cas / (7.0 * P_0)) ** 3.5 - 1.0)
     tas = np.sqrt(7.0 * p / rho * ((1.0 + qdyn / p) ** (2.0 / 7.0) - 1.0))
     tas = np.where(cas < 0, -1 * tas, tas)
-    return tas.to("kts")  # type: ignore
+    return tas.to("kts")
 
 
 @default_units(tas="kts", h="ft")
-def tas2cas(tas: Any, h: Any) -> pint.Quantity[Any]:
+def tas2cas(tas: Any, h: Any) -> pint.Quantity:
     """
     :param tas: True Air Speed, (by default in kts)
     :param h: altitude, (by default in ft)
@@ -97,11 +97,11 @@ def tas2cas(tas: Any, h: Any) -> pint.Quantity[Any]:
     qdyn = p * ((1.0 + rho * tas * tas / (7.0 * p)) ** 3.5 - 1.0)
     cas = np.sqrt(7.0 * P_0 / RHO_0 * ((qdyn / P_0 + 1.0) ** (2.0 / 7.0) - 1.0))
     cas = np.where(tas < 0, -1 * cas, cas)
-    return cas.to("kts")  # type: ignore
+    return cas.to("kts")
 
 
 @default_units(M="dimensionless", h="ft")
-def mach2cas(M: Any, h: Any) -> pint.Quantity[Any]:
+def mach2cas(M: Any, h: Any) -> pint.Quantity:
     """
     :param M: Mach number
     :param h: altitude, (by default in ft)
@@ -114,7 +114,7 @@ def mach2cas(M: Any, h: Any) -> pint.Quantity[Any]:
 
 
 @default_units(cas="kts", h="ft")
-def cas2mach(cas: Any, h: Any) -> pint.Quantity[Any]:
+def cas2mach(cas: Any, h: Any) -> pint.Quantity:
     """
     :param cas: Computed Air Speed, (by default in kts)
     :param h: altitude, (by default in ft)

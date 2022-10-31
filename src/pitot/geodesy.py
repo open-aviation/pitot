@@ -64,7 +64,7 @@ def destination(
     lat: float,
     lon: float,
     bearing: float,
-    distance: pint.Quantity[Any],
+    distance: pint.Quantity,
     *args: Any,
     **kwargs: Any,
 ) -> Any:

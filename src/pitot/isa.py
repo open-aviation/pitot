@@ -22,7 +22,7 @@ H_TROP = Q_(11000, "m")  # tropopause altitude
 
 
 @default_units(h=ureg.meter)
-def temperature(h: Any) -> pint.Quantity[Any]:
+def temperature(h: Any) -> pint.Quantity:
     """Temperature of ISA atmosphere
 
     :param h: the altitude (by default in meters), :math:`0 < h < 84852`
@@ -31,7 +31,7 @@ def temperature(h: Any) -> pint.Quantity[Any]:
     :return: the temperature (in K)
 
     """
-    temp: pint.Quantity[Any] = np.maximum(  # type: ignore
+    temp: pint.Quantity[Any] = np.maximum(
         Q_(288.15, "K") - Q_(0.0065, "K/m") * h,
         STRATOSPHERE_TEMP,
     )
@@ -39,7 +39,7 @@ def temperature(h: Any) -> pint.Quantity[Any]:
 
 
 @default_units(h=ureg.meter)
-def density(h: Any) -> pint.Quantity[Any]:
+def density(h: Any) -> pint.Quantity:
     """Density of ISA atmosphere
 
     :param h: the altitude (by default in meters), :math:`0 < h < 84852`
@@ -51,14 +51,14 @@ def density(h: Any) -> pint.Quantity[Any]:
     temp = temperature(h)
     density_troposphere = RHO_0 * (temp / Q_(288.15, "K")) ** 4.256848
     delta = np.maximum(Q_(0, "m"), h - Q_(11000, "m"))
-    density: pint.Quantity[Any] = density_troposphere * np.exp(
+    density: pint.Quantity = density_troposphere * np.exp(
         -delta / Q_(6341.5522, "m")
     )
     return density
 
 
 @default_units(h=ureg.meter)
-def pressure(h: Any) -> pint.Quantity[Any]:
+def pressure(h: Any) -> pint.Quantity:
     """Pressure of ISA atmosphere
 
     :param h: the altitude (by default in meters), :math:`0 < h < 84852`
@@ -71,7 +71,7 @@ def pressure(h: Any) -> pint.Quantity[Any]:
     temp_0 = temperature(Q_(0, "m"))
     delta = np.maximum(Q_(0, "m"), h - H_TROP)
 
-    press: pint.Quantity[Any] = np.where(
+    press: pint.Quantity = np.where(
         h < H_TROP,
         P_0 * (temp / temp_0) ** (-G_0 / (BETA_T * R)),
         TROPOPAUSE_PRESS * np.exp(-G_0 / (R * STRATOSPHERE_TEMP) * delta),
@@ -80,9 +80,7 @@ def pressure(h: Any) -> pint.Quantity[Any]:
 
 
 @default_units(h=ureg.meter)
-def atmosphere(
-    h: Any,
-) -> Tuple[pint.Quantity[Any], pint.Quantity[Any], pint.Quantity[Any]]:
+def atmosphere(h: Any) -> Tuple[pint.Quantity, pint.Quantity, pint.Quantity]:
     """Pressure of ISA atmosphere
 
     :param h: the altitude (by default in meters), :math:`0 < h < 84852`
@@ -91,17 +89,17 @@ def atmosphere(
     :return: a tuple (pressure, density, temperature)
 
     """
-    temp: pint.Quantity[Any] = np.maximum(  # type: ignore
+    temp: pint.Quantity = np.maximum(
         Q_(288.15, "K") - Q_(0.0065, "K/m") * h,
         STRATOSPHERE_TEMP,
     )
     density_troposphere = RHO_0 * (temp / Q_(288.15, "K")) ** 4.256848
     delta = np.maximum(Q_(0, "m"), h - Q_(11000, "m"))
-    den: pint.Quantity[Any] = density_troposphere * np.exp(
+    den: pint.Quantity = density_troposphere * np.exp(
         -delta / Q_(6341.5522, "m")
     )
     temp_0 = temperature(Q_(0, "m"))
-    press: pint.Quantity[Any] = np.where(
+    press: pint.Quantity = np.where(
         h < H_TROP,
         P_0 * (temp / temp_0) ** (-G_0 / (BETA_T * R)),
         TROPOPAUSE_PRESS * np.exp(-G_0 / (R * STRATOSPHERE_TEMP) * delta),
@@ -110,7 +108,7 @@ def atmosphere(
 
 
 @default_units(h=ureg.meter)
-def sound_speed(h: Any) -> pint.Quantity[Any]:
+def sound_speed(h: Any) -> pint.Quantity:
     """Speed of sound in ISA atmosphere
 
     :param h: the altitude (by default in meters), :math:`0 < h < 84852`
@@ -121,4 +119,4 @@ def sound_speed(h: Any) -> pint.Quantity[Any]:
     """
     temp = temperature(h)
     a = np.sqrt(GAMMA * R * temp)
-    return a  # type: ignore
+    return a

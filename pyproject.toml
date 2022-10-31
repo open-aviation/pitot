@@ -30,7 +30,8 @@ python = "^3.8"
 numpy = "^1.23.0"
 pandas = "^1.4.3"
 Pint = ">=0.19.2,<0.21.0"
-Pint-Pandas = "^0.2"
+# Pint-Pandas = "^0.2"
+Pint-Pandas = {git = "https://github.com/hgrecco/pint-pandas.git", rev = "master"}
 typing-extensions = "^4.3.0"
 pyproj = "^3.3.1"
 
