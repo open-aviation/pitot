@@ -71,19 +71,31 @@ def couscous(fun: Callable) -> Callable:
         fun (function): decorated function
 
     Returns:
+<<<<<<< HEAD
         new_fun (function): new function based on input
         function with eventually modified
+=======
+        new_fun (function): new function based on input function with eventually modified
+>>>>>>> it's couscous time !
         code to keep unit coherence.
     """
 
     fun_tree = ast.parse(
         textwrap.dedent(inspect.getsource(fun))  # dedent for nested methods
     )  # get the function AST
+<<<<<<< HEAD
     visitor = Visitor(fun)
+=======
+    visitor = Visitor(fun.__globals__)
+>>>>>>> it's couscous time !
     fun_tree = visitor.visit(fun_tree)  # send it to the NodeTransformer
     f_str = astor.to_source(
         fun_tree
     )  # get the string of the transformed function
+<<<<<<< HEAD
+=======
+    _log.warning(f_str)
+>>>>>>> it's couscous time !
     exec(f_str[f_str.find("\n") + 1 :], fun.__globals__, locals())
 
     new_fun = locals()[fun.__name__]

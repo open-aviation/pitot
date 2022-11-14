@@ -12,6 +12,10 @@ def test_mixed_units():
         alt_2: "ft" = 350
         temp: "K" = 120
         result: "m / K" = (alt_1 + alt_2) * 25 / temp
+<<<<<<< HEAD
+=======
+        print(result)
+>>>>>>> it's couscous time !
         assert result == pytest.approx(230.55, rel=1e-2)
 
     test_mixed_units()
@@ -29,6 +33,7 @@ def test_add_operation():
     test_operation()
 
 
+<<<<<<< HEAD
 def test_dimless_var():
     @couscous
     def test_dimless_var():
@@ -42,6 +47,8 @@ def test_dimless_var():
     test_dimless_var()
 
 
+=======
+>>>>>>> it's couscous time !
 def test_list_operation():
     @couscous
     def test_operation():
