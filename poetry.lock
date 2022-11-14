@@ -628,6 +628,17 @@ files = [
 ]
 
 [[package]]
+name = "pyparsing"
+version = "3.0.9"
+description = "pyparsing module - Classes and methods to define and execute parsing grammars"
+category = "dev"
+optional = false
+python-versions = ">=3.6.8"
+
+[package.extras]
+diagrams = ["railroad-diagrams", "jinja2"]
+
+[[package]]
 name = "pyproj"
 version = "3.4.1"
 description = "Python interface to PROJ (cartographic projections and coordinate transformations library)"
@@ -873,6 +884,7 @@ testing = ["coverage (>=6.2)", "coverage-enable-subprocess (>=1)", "flaky (>=3.7
 lock-version = "2.0"
 python-versions = "^3.8"
 <<<<<<< HEAD
+<<<<<<< HEAD
 content-hash = "14f72d1407474f50f5ed0dc23029fcd73e4d0be3621768e8485b014be5252fb5"
 <<<<<<< HEAD
 
@@ -1107,6 +1119,35 @@ pint = [
     {file = "Pint-0.20.1.tar.gz", hash = "sha256:387cf04078dc7dfe4a708033baad54ab61d82ab06c4ee3d4922b1e45d5626067"},
 ]
 >>>>>>> d15d336db669f858b82bfeced8065d7412d2868b
+=======
+content-hash = "84b070bd01e8621cb52becb2498a09d60964a5a0dd4855cb44965dbcf7f43c1d"
+
+[metadata.files]
+astor = []
+attrs = []
+black = []
+certifi = []
+cfgv = []
+click = []
+colorama = []
+coverage = []
+distlib = []
+exceptiongroup = []
+filelock = []
+flake8 = []
+identify = []
+iniconfig = []
+isort = []
+mccabe = []
+mypy = []
+mypy-extensions = []
+nodeenv = []
+numpy = []
+packaging = []
+pandas = []
+pathspec = []
+pint = []
+>>>>>>> it's couscous time !
 Pint-Pandas = []
 platformdirs = []
 pluggy = []
@@ -1125,8 +1166,11 @@ toml = []
 tomli = []
 typing-extensions = []
 virtualenv = []
+<<<<<<< HEAD
 =======
 >>>>>>> bump versions
 =======
 content-hash = "bed7e9d715988ad18a3ab4d2f0681e7a0e29010bd635b5db49dd1900c302a3e1"
 >>>>>>> bump version
+=======
+>>>>>>> it's couscous time !
