@@ -7,7 +7,6 @@ import numpy as np
 
 m = K = ft = cm = Any
 
-
 # -----------------------
 # du : different units
 # wu : wrong units
@@ -109,12 +108,29 @@ def test_call_np():
         c: "K/m" = 0.0065
         temp: "K" = np.maximum(
             temp_0 - c * h,
-            STRATOSPHERE_TEMP,
+            216.65,
         )
         return temp
 
     m: "m" = 11000
     res = test_call_np(m)
+    assert res == pytest.approx(STRATOSPHERE_TEMP, rel=1e-1)
+
+
+def test_using_globals():
+    @couscous
+    def test_using_globals(h: "m") -> "K":
+
+        temp_0: "K" = 288.15
+        c: "K/m" = 0.0065
+        temp: "K" = np.maximum(
+            temp_0 - c * h,
+            STRATOSPHERE_TEMP,
+        )
+        return temp
+
+    m: "m" = 11000
+    res = test_using_globals(m)
     assert res == pytest.approx(STRATOSPHERE_TEMP, rel=1e-1)
 
 
