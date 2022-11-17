@@ -2,7 +2,6 @@ from typing import Any
 import pytest
 from pitot.wrapper import couscous
 import pint
-from pitot import Q_
 
 m = K = ft = Any
 
@@ -36,14 +35,16 @@ def test_different_units():
 
 
 def test_wrong_units():
-    @couscous
-    def test_wrong_units():
+    with pytest.warns():
 
-        alt_m: "m" = 1000
-        with pytest.raises(pint.errors.DimensionalityError):
+        @couscous
+        def test_wrong_units():
+
+            alt_m: "m" = 1000
             alt_K: "K" = alt_m
+            print(alt_K)
 
-    test_wrong_units()
+        test_wrong_units()
 
 
 def main():

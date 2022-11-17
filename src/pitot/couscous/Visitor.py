@@ -3,8 +3,10 @@ from __future__ import annotations
 import ast
 import inspect
 import logging
-from typing import Any, Callable
+from typing import Any
+import warnings
 from .QuantityNode import QuantityNode
+from pint import UnitRegistry
 import pint
 
 _log = logging.getLogger(__name__)
@@ -33,6 +35,7 @@ def raise_dim_error(e, received, expected):
 class Visitor(ast.NodeTransformer):
     def __init__(self, fun_globals) -> None:
         self.fun_globals = fun_globals
+        self.ureg = UnitRegistry()
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> Any:
         self.vars = {}
@@ -42,7 +45,8 @@ class Visitor(ast.NodeTransformer):
         return node
 
     def get_node_unit(self, node: ast.AST) -> QuantityNode:
-        """Method to induce the unit of a node through recursive calls on children if any.
+        """Method to induce the unit of a node through recursive
+        calls on children if any.
 
         Args:
             node (ast.AST): input node
@@ -123,10 +127,28 @@ class Visitor(ast.NodeTransformer):
                 return QuantityNode(new_node, unit)
 
         elif isinstance(node, ast.Call):
-            pass
 
+            if isinstance(node.func, ast.Name):
+                unit = inspect.signature(
+                    self.fun_globals[node.func.id]
+                ).return_annotation
+            elif isinstance(node.func, ast.Attribute):
+                unit = inspect.signature(
+                    getattr(
+                        self.fun_globals[node.func.value.id],
+                        node.func.attr,
+                    ).__call__
+                ).return_annotation
+
+            try:
+                if unit in self.ureg:
+                    return QuantityNode(node, unit)
+                else:
+                    return QuantityNode(node, "dimensionless")
+            except AttributeError:
+                return QuantityNode(node, "dimensionless")
         else:
-            return QuantityNode(node, None)
+            return QuantityNode(node, "dimensionless")
 
     def visit_Call(self, node: ast.Call) -> Any:
 
@@ -151,7 +173,6 @@ class Visitor(ast.NodeTransformer):
                         raise_node = raise_dim_error(
                             pint.errors.DimensionalityError, received, expected
                         )
-                        ast.copy_location(raise_node, node)
                         return raise_node
 
                     new_arg = ast.BinOp(
@@ -176,53 +197,49 @@ class Visitor(ast.NodeTransformer):
 
     def visit_AnnAssign(self, node: ast.AnnAssign) -> Any:
 
-        if isinstance(node.value, ast.Call):
-            # TODO : Check if annotation = return annotation of func
-            self.vars[node.target.id] = inspect.signature(
-                self.fun_globals[node.value.func.value.id]
-            ).return_annotation
+        value = self.get_node_unit(node.value)
 
-        elif isinstance(node.value, ast.Name):
-            if (received := self.vars[node.value.id]) != (
-                expected := node.annotation.value
-            ):
-                if pint.Unit(received).is_compatible_with(pint.Unit(expected)):
-                    conv_value = (
-                        pint.Unit(expected).from_(pint.Unit(received)).m
-                    )
-                else:
-                    raise_node = raise_dim_error(
-                        pint.errors.DimensionalityError, received, expected
-                    )
-                    ast.copy_location(raise_node, node)
-                    return raise_node
+        if value.node != node.value:
+            node = ast.AnnAssign(
+                target=node.target,
+                annotation=node.annotation,
+                value=value.node,
+                simple=node.simple,
+            )
 
+        if (received := value.unit) != (expected := node.annotation.value):
+            if pint.Unit(received).is_compatible_with(pint.Unit(expected)):
+                conv_value = pint.Unit(expected).from_(pint.Unit(received)).m
                 new_value = ast.BinOp(
                     node.value,
                     ast.Mult(),
                     ast.Constant(conv_value),
                 )
-
-                return ast.AnnAssign(
+                new_node = ast.AnnAssign(
                     target=node.target,
                     annotation=node.annotation,
                     value=new_value,
                     simple=node.simple,
                 )
 
+            else:
+                # TODO : Warning for a dimension discrepancy
+                warnings.warn("Bad bad units")
+                new_node = node
         else:
-            try:
-                self.vars[node.target.id] = node.annotation.value
-            except AttributeError:
-                print("Units Annotation should be strings")
+            new_node = node
 
-        self.generic_visit(node)
-        return node
+        self.vars[node.target.id] = node.annotation.value
+        ast.copy_location(new_node, node)
+        return new_node
 
     def visit_BinOp(self, node: ast.BinOp) -> Any:
         return self.get_node_unit(node).node
 
     def visit_Assign(self, node: ast.Assign) -> Any:
+
+        value = self.get_node_unit(node.value)
+
         if isinstance(node.value, ast.Call):
             for target in node.targets:
                 if isinstance(target, ast.Tuple):

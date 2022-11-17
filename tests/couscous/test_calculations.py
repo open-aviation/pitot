@@ -25,6 +25,7 @@ def test_add_operation():
         alt_ft: "ft" = 2000
         alt_m2: "m" = 3000
         result: "m" = alt_m + alt_ft + alt_m2
+        print(result)
         assert result == pytest.approx(4609.6, rel=1e-2)
 
     test_operation()
