@@ -1,11 +1,11 @@
-from re import T
 from typing import Any, Tuple
 import pytest
 from pitot.wrapper import couscous
+from pitot.couscous.isa import STRATOSPHERE_TEMP
 import pint
 import numpy as np
 
-m = K = ft = Any
+m = K = ft = cm = Any
 
 
 # -----------------------
@@ -30,24 +30,30 @@ def temperature_2(altitude_m: "m", altitude_ft: "ft") -> Tuple["K", "K"]:
     return temp_m, temp_ft
 
 
-@couscous
 def test_base():
+    @couscous
+    def test_base():
 
-    alt_m: "m" = 1000
-    temp = temperature(alt_m)
-    assert temp == pytest.approx(281.65, rel=1e-1)
+        alt_m: "m" = 1000
+        temp = temperature(alt_m)
+        assert temp == pytest.approx(281.65, rel=1e-1)
+
+    test_base()
 
 
-@couscous
 def test_base_cm():
+    @couscous
+    def test_base_cm():
 
-    alt_m: "m" = 1000
-    temp = temperature(alt_m)
-    assert temp == pytest.approx(281.65, rel=1e-1)
+        alt_m: "m" = 1000
+        temp = temperature(alt_m)
+        assert temp == pytest.approx(281.65, rel=1e-1)
 
-    alt_cm: "cm" = 100000
-    temp = temperature(alt_cm)
-    assert temp == pytest.approx(281.65, rel=1e-1)
+        alt_cm: "cm" = 100000
+        temp = temperature(alt_cm)
+        assert temp == pytest.approx(281.65, rel=1e-1)
+
+    test_base_cm()
 
 
 def test_2_params():
@@ -75,11 +81,14 @@ def test_tuples():
     test_2_params()
 
 
-@couscous
 def test_different_units():
-    alt_ft: "ft" = 1000
-    temp = temperature(alt_ft)
-    assert temp == pytest.approx(286.17, rel=1e-1)
+    @couscous
+    def test_different_units():
+        alt_ft: "ft" = 1000
+        temp = temperature(alt_ft)
+        assert temp == pytest.approx(286.17, rel=1e-1)
+
+    test_different_units()
 
 
 def test_binOp():
@@ -92,11 +101,31 @@ def test_binOp():
     test_binOp()
 
 
-@couscous
+def test_call_np():
+    @couscous
+    def test_call_np(h: "m") -> "K":
+
+        temp_0: "K" = 288.15
+        c: "K/m" = 0.0065
+        temp: "K" = np.maximum(
+            temp_0 - c * h,
+            STRATOSPHERE_TEMP,
+        )
+        return temp
+
+    m: "m" = 11000
+    res = test_call_np(m)
+    assert res == pytest.approx(STRATOSPHERE_TEMP, rel=1e-1)
+
+
 def test_wrong_units():
-    with pytest.raises(pint.errors.DimensionalityError):
-        alt_ft: "K" = 1000
-        temperature(alt_ft)
+    @couscous
+    def test_wrong_units():
+        with pytest.raises(pint.errors.DimensionalityError):
+            alt_ft: "K" = 1000
+            temperature(alt_ft)
+
+    test_wrong_units()
 
 
 def main():

@@ -1,2 +1,2 @@
-from .wrapper import Visitor
+from .Visitor import Visitor
 from .QuantityNode import QuantityNode

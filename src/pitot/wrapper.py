@@ -70,7 +70,8 @@ def couscous(fun: Callable) -> Callable:
         fun (function): decorated function
 
     Returns:
-        new_fun (function): new function based on input function with eventually modified
+        new_fun (function): new function based on input
+        function with eventually modified
         code to keep unit coherence.
     """
 
