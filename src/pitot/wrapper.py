@@ -18,6 +18,8 @@ from .couscous import Visitor
 ReturnQuantity = Callable[..., pint.Quantity]
 
 _log = logging.getLogger(__name__)
+f_handler = logging.FileHandler("file.log")
+_log.addHandler(f_handler)
 
 
 def default_units(**unit_kw: str | pint.Unit) -> Callable[..., ReturnQuantity]:

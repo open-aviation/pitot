@@ -23,7 +23,6 @@ TROPOPAUSE_PRESS: "Pa" = 22632.0401  # pressure at tropopause, ISA
 H_TROP: "m" = 11000  # tropopause altitude
 
 
-@couscous
 def temperature(h: "m") -> "K":
     """Temperature of ISA atmosphere
 

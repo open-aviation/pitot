@@ -9,10 +9,6 @@ from .QuantityNode import QuantityNode
 from pint import UnitRegistry
 import pint
 
-_log = logging.getLogger(__name__)
-f_handler = logging.FileHandler("file.log")
-_log.addHandler(f_handler)
-
 
 class AstRaise(ast.NodeTransformer):
     def get_node(self, except_name: str) -> ast.Raise:
@@ -40,7 +36,13 @@ class Visitor(ast.NodeTransformer):
     def visit_FunctionDef(self, node: ast.FunctionDef) -> Any:
         self.vars = {}
         self.calls = {}
-        # TODO : put
+
+        for arg in node.args.args:
+            self.vars[arg.arg] = (
+                arg.annotation.value
+                if arg.annotation is not None
+                else "dimensionless"
+            )
         self.generic_visit(node)
         return node
 
@@ -58,7 +60,11 @@ class Visitor(ast.NodeTransformer):
         if isinstance(node, ast.Constant):
             return QuantityNode(node, "dimensionless")
         elif isinstance(node, ast.Tuple):
-            return tuple(map(self.get_node_unit, node.elts))
+            elems = list(map(self.get_node_unit, node.elts))
+            return QuantityNode(
+                ast.Tuple([elem.node for elem in elems], ctx=node.ctx),
+                [elem.unit for elem in elems],
+            )
         elif isinstance(node, ast.List):
             return list(map(self.get_node_unit, node.elts))
         elif isinstance(node, ast.Set):
@@ -129,26 +135,62 @@ class Visitor(ast.NodeTransformer):
         elif isinstance(node, ast.Call):
 
             if isinstance(node.func, ast.Name):
-                unit = inspect.signature(
-                    self.fun_globals[node.func.id]
-                ).return_annotation
+                signature = inspect.signature(self.fun_globals[node.func.id])
             elif isinstance(node.func, ast.Attribute):
-                unit = inspect.signature(
+                signature = inspect.signature(
                     getattr(
                         self.fun_globals[node.func.value.id],
                         node.func.attr,
                     ).__call__
-                ).return_annotation
+                )
 
-            try:
-                if unit in self.ureg:
-                    return QuantityNode(node, unit)
-                else:
-                    return QuantityNode(node, "dimensionless")
-            except AttributeError:
-                return QuantityNode(node, "dimensionless")
-        else:
-            return QuantityNode(node, "dimensionless")
+            unit = (
+                signature.return_annotation
+                if signature.return_annotation is not inspect._empty
+                else "dimensionless"
+            )
+
+            new_args = []
+            for i, (_, value) in enumerate(signature.parameters.items()):
+                if (received := self.get_node_unit(node.args[i]).unit) != (
+                    expected := value.annotation
+                ):
+                    if expected is inspect._empty:
+                        pass
+                    else:
+                        if pint.Unit(received).is_compatible_with(
+                            pint.Unit(expected)
+                        ):
+                            conv_value = (
+                                pint.Unit(expected).from_(pint.Unit(received)).m
+                            )
+                        else:
+                            raise_node = raise_dim_error(
+                                pint.errors.DimensionalityError,
+                                received,
+                                expected,
+                            )
+                            return raise_node
+
+                        new_arg = ast.BinOp(
+                            node.args[i],
+                            ast.Mult(),
+                            ast.Constant(conv_value),
+                        )
+                        new_args.append(new_arg)
+
+            new_node = (
+                node
+                if not new_args
+                else ast.Call(
+                    func=node.func,
+                    args=new_args,
+                    keywords=node.keywords,
+                )
+            )
+
+            ast.copy_location(new_node, node)
+            return QuantityNode(new_node, unit)
 
     def visit_Call(self, node: ast.Call) -> Any:
 
@@ -231,6 +273,7 @@ class Visitor(ast.NodeTransformer):
 
         self.vars[node.target.id] = node.annotation.value
         ast.copy_location(new_node, node)
+        ast.fix_missing_locations(new_node)
         return new_node
 
     def visit_BinOp(self, node: ast.BinOp) -> Any:
@@ -239,6 +282,12 @@ class Visitor(ast.NodeTransformer):
     def visit_Assign(self, node: ast.Assign) -> Any:
 
         value = self.get_node_unit(node.value)
+
+        if value.node != node.value:
+            node = ast.Assign(
+                targets=node.targets,
+                value=value.node,
+            )
 
         if isinstance(node.value, ast.Call):
             for target in node.targets:
@@ -252,9 +301,23 @@ class Visitor(ast.NodeTransformer):
                             .__forward_value__
                         )
                 else:
-                    self.vars[target.id] = inspect.signature(
-                        self.fun_globals[node.value.func.id]
-                    ).return_annotation
+                    self.vars[target.id] = value.unit
 
-        self.generic_visit(node)
-        return node
+            new_node = node
+
+        else:
+            new_node = ast.Assign(
+                targets=node.targets,
+                value=value.node,
+                type_comment=f"unit: {value.unit}",
+            )
+            for target in node.targets:
+                if isinstance(target, ast.Tuple):
+                    for i, elem in enumerate(target.elts):
+                        self.vars[elem.id] = value.unit[i]
+                else:
+                    self.vars[target.id] = value.unit
+
+        ast.copy_location(new_node, node)
+        ast.fix_missing_locations(new_node)
+        return new_node
