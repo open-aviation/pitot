@@ -36,7 +36,7 @@ typing-extensions = "^4.3.0"
 pyproj = "^3.3.1"
 
 [tool.poetry.dev-dependencies]
-mypy = "^0.990"
+mypy = "^0.991"
 isort = "^5.10.1"
 black = "^22.10.0"
 flake8 = "^5.0.4"
