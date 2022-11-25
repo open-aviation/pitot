@@ -1,11 +1,11 @@
 from typing import Any, Tuple
 import pytest
 from pitot.wrapper import couscous
-from pitot.couscous.isa import STRATOSPHERE_TEMP
+from pitot.couscous import isa
 import pint
 import numpy as np
 
-m = K = ft = cm = Any
+m = K = ft = cm = Pa = Any
 
 # -----------------------
 # du : different units
@@ -14,18 +14,16 @@ m = K = ft = cm = Any
 # -----------------------
 
 
+@couscous
 def temperature(altitude_m: "m") -> "K":
-    temp: pint.Quantity[Any] = np.maximum(288.15 - 0.0065 * altitude_m, 216.65)
+    temp: "K" = np.maximum(288.15 - 0.0065 * altitude_m, 216.65)
     return temp
 
 
+@couscous
 def temperature_2(altitude_m: "m", altitude_ft: "ft") -> Tuple["K", "K"]:
-    temp_m: pint.Quantity[Any] = np.maximum(
-        288.15 - 0.0065 * altitude_m, 216.65
-    )
-    temp_ft: pint.Quantity[Any] = np.maximum(
-        288.15 - 0.0065 * altitude_ft * 0.3048, 216.65
-    )
+    temp_m: "K" = np.maximum(288.15 - 0.0065 * altitude_m, 216.65)
+    temp_ft: "K" = np.maximum(288.15 - 0.0065 * altitude_ft * 0.3048, 216.65)
     return temp_m, temp_ft
 
 
@@ -114,7 +112,7 @@ def test_call_np():
 
     m: "m" = 11000
     res = test_call_np(m)
-    assert res == pytest.approx(STRATOSPHERE_TEMP, rel=1e-1)
+    assert res == pytest.approx(isa.STRATOSPHERE_TEMP, rel=1e-1)
 
 
 def test_using_globals():
@@ -123,15 +121,16 @@ def test_using_globals():
 
         temp_0: "K" = 288.15
         c: "K/m" = 0.0065
+        e = isa.STRATOSPHERE_TEMP
         temp: "K" = np.maximum(
             temp_0 - c * h,
-            STRATOSPHERE_TEMP,
+            e,
         )
         return temp
 
     m: "m" = 11000
     res = test_using_globals(m)
-    assert res == pytest.approx(STRATOSPHERE_TEMP, rel=1e-1)
+    assert res == pytest.approx(isa.STRATOSPHERE_TEMP, rel=1e-1)
 
 
 def test_wrong_units():
@@ -140,6 +139,16 @@ def test_wrong_units():
         with pytest.raises(pint.errors.DimensionalityError):
             alt_ft: "K" = 1000
             temperature(alt_ft)
+
+    test_wrong_units()
+
+
+def test_wrong_received_units():
+    @couscous
+    def test_wrong_units():
+        alt_ft: "ft" = 1000
+        with pytest.raises(pint.errors.DimensionalityError):
+            res: "ft" = temperature(alt_ft)
 
     test_wrong_units()
 
