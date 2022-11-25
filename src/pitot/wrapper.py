@@ -10,6 +10,7 @@ from typing import Any, Callable
 import astor
 import pandas as pd
 import pint
+import sys
 from pint_pandas import PintArray, PintType
 
 from . import Q_
@@ -18,8 +19,6 @@ from .couscous import Visitor
 ReturnQuantity = Callable[..., pint.Quantity]
 
 _log = logging.getLogger(__name__)
-f_handler = logging.FileHandler("file.log")
-_log.addHandler(f_handler)
 
 
 def default_units(**unit_kw: str | pint.Unit) -> Callable[..., ReturnQuantity]:
@@ -80,12 +79,11 @@ def couscous(fun: Callable) -> Callable:
     fun_tree = ast.parse(
         textwrap.dedent(inspect.getsource(fun))  # dedent for nested methods
     )  # get the function AST
-    visitor = Visitor(fun.__globals__)
+    visitor = Visitor(fun)
     fun_tree = visitor.visit(fun_tree)  # send it to the NodeTransformer
     f_str = astor.to_source(
         fun_tree
     )  # get the string of the transformed function
-    _log.warning(f_str)
     exec(f_str[f_str.find("\n") + 1 :], fun.__globals__, locals())
 
     new_fun = locals()[fun.__name__]

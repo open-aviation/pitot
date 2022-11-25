@@ -3,11 +3,30 @@ from __future__ import annotations
 import ast
 import inspect
 import logging
+import sys
+import types
 from typing import Any
-import warnings
+from typing_extensions import Annotated, TypeGuard
 from .QuantityNode import QuantityNode
 from pint import UnitRegistry
 import pint
+
+annot_type = type(Annotated[int, "spam"])
+
+_log = logging.getLogger(__name__)
+
+logging.basicConfig(
+    level=logging.WARNING,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler("debug.log"),
+        logging.StreamHandler(sys.stdout),
+    ],
+)
+
+
+def is_annotated(hint: Any, annot_type=annot_type) -> TypeGuard[annot_type]:
+    return (type(hint) is annot_type) and hasattr(hint, "__metadata__")
 
 
 class AstRaise(ast.NodeTransformer):
@@ -29,20 +48,61 @@ def raise_dim_error(e, received, expected):
 
 
 class Visitor(ast.NodeTransformer):
-    def __init__(self, fun_globals) -> None:
-        self.fun_globals = fun_globals
-        self.ureg = UnitRegistry()
+    couscous_func: dict[str, inspect.Signature] = {}
+    ureg = UnitRegistry()
+
+    @classmethod
+    def add_func(cls, fun):
+        cls.couscous_func[fun.__name__] = inspect.signature(fun)
+
+    def __init__(self, fun) -> None:
+        self.fun_globals = fun.__globals__
+        self.mod = sys.modules[fun.__module__]
+        self.add_func(fun)
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> Any:
         self.vars = {}
         self.calls = {}
 
+        # Adding all annotations from own module
+        annotations = getattr(self.mod, "__annotations__", None)
+        if annotations is not None:
+            for name, anno in annotations.items():
+                if is_annotated(anno):
+                    self.vars[name] = anno.__metadata__[0]
+                if isinstance(anno, str):
+                    self.vars[name] = anno
+
+        # Adding all annotations from imported modules
+        for _, val in self.fun_globals.items():
+            if isinstance(val, types.ModuleType):
+                annotations = getattr(val, "__annotations__", None)
+                if annotations is not None:
+                    for name, anno in annotations.items():
+                        if is_annotated(anno):
+                            self.vars[name] = anno.__metadata__[0]
+                        if isinstance(anno, str):
+                            self.vars[name] = anno
+
         for arg in node.args.args:
-            self.vars[arg.arg] = (
-                arg.annotation.value
-                if arg.annotation is not None
-                else "dimensionless"
-            )
+            annotation = getattr(arg, "annotation", None)
+            if annotation is not None:
+                if isinstance(annotation, ast.Constant):
+                    if annotation.value in self.ureg:
+                        self.vars[arg.arg] = arg.annotation.value
+                    else:
+                        _log.warning(
+                            "Signature of couscoussed functions must be in Unit Registry"
+                        )
+                elif isinstance(annotation, ast.Subscript):
+                    if annotation.value.id == "Annotated":
+                        self.vars[arg.arg] = arg.annotation.slice.value.elts[
+                            1
+                        ].value
+                else:
+                    _log.warning(
+                        "Signature of couscoussed functions must be of type string or typing.Annotated"
+                    )
         self.generic_visit(node)
         return node
 
@@ -58,7 +118,7 @@ class Visitor(ast.NodeTransformer):
         """
 
         if isinstance(node, ast.Constant):
-            return QuantityNode(node, "dimensionless")
+            return QuantityNode(node, None)
         elif isinstance(node, ast.Tuple):
             elems = list(map(self.get_node_unit, node.elts))
             return QuantityNode(
@@ -85,6 +145,11 @@ class Visitor(ast.NodeTransformer):
             left = self.get_node_unit(node.left)
             right = self.get_node_unit(node.right)
 
+            if left.unit is None or right.unit is None:
+                new_node = ast.BinOp(left.node, node.op, right.node)
+                ast.copy_location(new_node, node)
+                return QuantityNode(new_node, None)
+
             if pint.Unit(left.unit).is_compatible_with(pint.Unit(right.unit)):
                 conv_value = pint.Unit(left.unit).from_(pint.Unit(right.unit)).m
                 new_node = ast.BinOp(
@@ -100,13 +165,18 @@ class Visitor(ast.NodeTransformer):
                     pint.errors.DimensionalityError, right.unit, left.unit
                 )
                 ast.copy_location(raise_node, node)
-                return raise_node
+                return QuantityNode(raise_node, "dimensionless")
 
         elif isinstance(node, ast.BinOp) and isinstance(
             node.op, (ast.Mult, ast.Div)
         ):
             left = self.get_node_unit(node.left)
             right = self.get_node_unit(node.right)
+
+            if left.unit is None or right.unit is None:
+                new_node = ast.BinOp(left.node, node.op, right.node)
+                ast.copy_location(new_node, node)
+                return QuantityNode(new_node, None)
 
             if pint.Unit(left.unit).is_compatible_with(pint.Unit(right.unit)):
                 conv_value = pint.Unit(left.unit).from_(pint.Unit(right.unit)).m
@@ -122,6 +192,7 @@ class Visitor(ast.NodeTransformer):
                     else "dimensionless"
                 )
                 return QuantityNode(new_node, unit)
+
             else:
                 new_node = ast.BinOp(left.node, node.op, right.node)
                 ast.copy_location(new_node, node)
@@ -132,29 +203,35 @@ class Visitor(ast.NodeTransformer):
                 )
                 return QuantityNode(new_node, unit)
 
+        elif isinstance(node, ast.BinOp):
+            return QuantityNode(node, self.get_node_unit(node.left).unit)
+
         elif isinstance(node, ast.Call):
 
-            if isinstance(node.func, ast.Name):
-                signature = inspect.signature(self.fun_globals[node.func.id])
-            elif isinstance(node.func, ast.Attribute):
-                signature = inspect.signature(
-                    getattr(
-                        self.fun_globals[node.func.value.id],
-                        node.func.attr,
-                    ).__call__
+            id = (
+                node.func.id
+                if isinstance(node.func, ast.Name)
+                else node.func.attr
+            )
+            if id in self.couscous_func:
+                signature = self.couscous_func[id]
+            else:
+                signature = inspect.Signature(
+                    parameters=None, return_annotation=None
                 )
 
-            unit = (
-                signature.return_annotation
-                if signature.return_annotation is not inspect._empty
-                else "dimensionless"
-            )
-
             new_args = []
-            for i, (_, value) in enumerate(signature.parameters.items()):
-                if (received := self.get_node_unit(node.args[i]).unit) != (
-                    expected := value.annotation
-                ):
+            for i, (_, param) in enumerate(signature.parameters.items()):
+
+                expected = param.annotation
+
+                if (received := self.get_node_unit(node.args[i]).unit) == None:
+                    _log.warning(
+                        f"Function {id} expected unit {expected} but received unitless quantity"
+                    )
+                    continue
+                if received != expected:
+
                     if expected is inspect._empty:
                         pass
                     else:
@@ -170,7 +247,7 @@ class Visitor(ast.NodeTransformer):
                                 received,
                                 expected,
                             )
-                            return raise_node
+                            return QuantityNode(raise_node, "dimensionless")
 
                         new_arg = ast.BinOp(
                             node.args[i],
@@ -190,7 +267,10 @@ class Visitor(ast.NodeTransformer):
             )
 
             ast.copy_location(new_node, node)
-            return QuantityNode(new_node, unit)
+            return QuantityNode(new_node, signature.return_annotation)
+
+        elif isinstance(node, ast.Attribute):
+            return QuantityNode(node, self.vars[node.attr])
 
     def visit_Call(self, node: ast.Call) -> Any:
 
@@ -249,8 +329,14 @@ class Visitor(ast.NodeTransformer):
                 simple=node.simple,
             )
 
-        if (received := value.unit) != (expected := node.annotation.value):
-            if pint.Unit(received).is_compatible_with(pint.Unit(expected)):
+        if value.unit is None:
+            _log.warning(f"The unit of {node.target.id} could not be checked.")
+            new_node = node
+
+        elif (received := value.unit) != (expected := node.annotation.value):
+            if received == "dimensionless":
+                new_node = node
+            elif pint.Unit(received).is_compatible_with(pint.Unit(expected)):
                 conv_value = pint.Unit(expected).from_(pint.Unit(received)).m
                 new_value = ast.BinOp(
                     node.value,
@@ -265,9 +351,10 @@ class Visitor(ast.NodeTransformer):
                 )
 
             else:
-                # TODO : Warning for a dimension discrepancy
-                warnings.warn("Bad bad units")
-                new_node = node
+                raise_node = raise_dim_error(
+                    pint.errors.DimensionalityError, received, expected
+                )
+                return raise_node
         else:
             new_node = node
 
