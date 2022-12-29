@@ -27,8 +27,8 @@ include = [
 
 [tool.poetry.dependencies]
 python = "^3.8"
-numpy = "^1.23.0"
-pandas = "^1.4.3"
+numpy = ">=1.23.0"
+pandas = ">=1.4.3"
 Pint = ">=0.19.2,<0.21.0"
 # Pint-Pandas = "^0.2"
 Pint-Pandas = {git = "https://github.com/hgrecco/pint-pandas.git", rev = "master"}
