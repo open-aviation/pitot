@@ -520,7 +520,7 @@ xarray = ["xarray"]
 
 [[package]]
 name = "Pint-Pandas"
-version = "0.4.dev32+gc58a7fc"
+version = "0.3.dev121+ge7584d5"
 description = "Physical quantities module"
 category = "main"
 optional = false
@@ -626,6 +626,10 @@ python-versions = ">=3.6.8"
 
 [package.extras]
 diagrams = ["railroad-diagrams", "jinja2"]
+files = [
+    {file = "pyflakes-2.5.0-py2.py3-none-any.whl", hash = "sha256:4579f67d887f804e67edb544428f264b7b24f435b263c4614f384135cea553d2"},
+    {file = "pyflakes-2.5.0.tar.gz", hash = "sha256:491feb020dca48ccc562a8c0cbe8df07ee13078df59813b83959cbdada312ea3"},
+]
 
 [[package]]
 name = "pyproj"
@@ -873,6 +877,7 @@ testing = ["coverage (>=6.2)", "coverage-enable-subprocess (>=1)", "flaky (>=3.7
 lock-version = "2.0"
 python-versions = "^3.8"
 content-hash = "84b070bd01e8621cb52becb2498a09d60964a5a0dd4855cb44965dbcf7f43c1d"
+
 
 [metadata.files]
 astor = []
