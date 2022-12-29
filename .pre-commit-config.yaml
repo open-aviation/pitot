@@ -20,7 +20,7 @@ repos:
     hooks:
       - id: sync_with_poetry
   - repo: https://github.com/psf/black
-    rev: 22.10.0
+    rev: 22.12.0
     hooks:
       - id: black
   - repo: https://github.com/PyCQA/isort
@@ -41,7 +41,7 @@ repos:
           - flake8-bugbear
           - flake8-simplify
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v0.982
+    rev: v0.991
     hooks:
       - id: mypy
         exclude: ^docs/conf.py
