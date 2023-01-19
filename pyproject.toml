@@ -86,8 +86,9 @@ warn_unused_configs = true
 warn_unused_ignores = true
 
 [tool.pytest.ini_options]
-addopts = "--log-level=DEBUG --color=yes"
+addopts = "--log-level=INFO --color=yes --doctest-modules --doctest-report ndiff"
 filterwarnings = [
   "ignore:.*unit of the quantity is strip.*:"
 ]
-testpaths = ["tests"]
+testpaths = ["tests", "src"]
+doctest_optionflags = ["NORMALIZE_WHITESPACE", "ELLIPSIS", "NUMBER"]
