@@ -520,7 +520,7 @@ xarray = ["xarray"]
 
 [[package]]
 name = "Pint-Pandas"
-version = "0.3.dev121+ge7584d5"
+version = "0.4.dev32+gc58a7fc"
 description = "Physical quantities module"
 category = "main"
 optional = false
@@ -876,8 +876,14 @@ testing = ["coverage (>=6.2)", "coverage-enable-subprocess (>=1)", "flaky (>=3.7
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
+<<<<<<< HEAD
 content-hash = "84b070bd01e8621cb52becb2498a09d60964a5a0dd4855cb44965dbcf7f43c1d"
 
+=======
+<<<<<<< HEAD
+content-hash = "14f72d1407474f50f5ed0dc23029fcd73e4d0be3621768e8485b014be5252fb5"
+<<<<<<< HEAD
+>>>>>>> bump version
 
 [metadata.files]
 astor = []
@@ -921,4 +927,13 @@ six = []
 toml = []
 tomli = []
 typing-extensions = []
+<<<<<<< HEAD
 virtualenv = []
+=======
+virtualenv = []
+=======
+>>>>>>> bump versions
+=======
+content-hash = "bed7e9d715988ad18a3ab4d2f0681e7a0e29010bd635b5db49dd1900c302a3e1"
+>>>>>>> bump version
+>>>>>>> bump version
