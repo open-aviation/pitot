@@ -1,23 +1,18 @@
-<<<<<<< HEAD
 from typing import Any, Tuple
-import pytest
-from pitot.wrapper import couscous
-from pitot.couscous import isa
-import pint
+
 import numpy as np
-
-m = K = ft = cm = Pa = Any
-=======
-from re import T
-from typing import Any, Tuple
-import pytest
-from pitot.wrapper import couscous
 import pint
-import numpy as np
+import pytest
+from impunity import impunity
+from typing_extensions import Annotated
 
-m = K = ft = Any
+from pitot import isa
 
->>>>>>> it's couscous time !
+m = Annotated[Any, "m"]
+ft = Annotated[Any, "ft"]
+K = Annotated[Any, "K"]
+Pa = Annotated[Any, "Pa"]
+cm = Annotated[Any, "cm"]
 
 # -----------------------
 # du : different units
@@ -26,23 +21,22 @@ m = K = ft = Any
 # -----------------------
 
 
-<<<<<<< HEAD
-@couscous
+@impunity  # type: ignore
 def temperature(altitude_m: "m") -> "K":
     temp: "K" = np.maximum(288.15 - 0.0065 * altitude_m, 216.65)
     return temp
 
 
-@couscous
+@impunity  # type: ignore
 def temperature_2(altitude_m: "m", altitude_ft: "ft") -> Tuple["K", "K"]:
     temp_m: "K" = np.maximum(288.15 - 0.0065 * altitude_m, 216.65)
     temp_ft: "K" = np.maximum(288.15 - 0.0065 * altitude_ft * 0.3048, 216.65)
     return temp_m, temp_ft
 
 
-def test_base():
-    @couscous
-    def test_base():
+def test_base() -> None:
+    @impunity  # type: ignore
+    def test_base() -> None:
 
         alt_m: "m" = 1000
         temp = temperature(alt_m)
@@ -51,9 +45,9 @@ def test_base():
     test_base()
 
 
-def test_base_cm():
-    @couscous
-    def test_base_cm():
+def test_base_cm() -> None:
+    @impunity  # type: ignore
+    def test_base_cm() -> None:
 
         alt_m: "m" = 1000
         temp = temperature(alt_m)
@@ -64,46 +58,11 @@ def test_base_cm():
         assert temp == pytest.approx(281.65, rel=1e-1)
 
     test_base_cm()
-=======
-def temperature(altitude_m: "m") -> "K":
-    temp: pint.Quantity[Any] = np.maximum(288.15 - 0.0065 * altitude_m, 216.65)
-    return temp
 
 
-def temperature_2(altitude_m: "m", altitude_ft: "ft") -> Tuple["K", "K"]:
-    temp_m: pint.Quantity[Any] = np.maximum(
-        288.15 - 0.0065 * altitude_m, 216.65
-    )
-    temp_ft: pint.Quantity[Any] = np.maximum(
-        288.15 - 0.0065 * altitude_ft * 0.3048, 216.65
-    )
-    return temp_m, temp_ft
-
-
-@couscous
-def test_base():
-
-    alt_m: "m" = 1000
-    temp = temperature(alt_m)
-    assert temp == pytest.approx(281.65, rel=1e-1)
-
-
-@couscous
-def test_base_cm():
-
-    alt_m: "m" = 1000
-    temp = temperature(alt_m)
-    assert temp == pytest.approx(281.65, rel=1e-1)
-
-    alt_cm: "cm" = 100000
-    temp = temperature(alt_cm)
-    assert temp == pytest.approx(281.65, rel=1e-1)
->>>>>>> it's couscous time !
-
-
-def test_2_params():
-    @couscous
-    def test_2_params():
+def test_2_params() -> None:
+    @impunity  # type: ignore
+    def test_2_params() -> None:
 
         alt_m: "m" = 1000
         alt_ft: "ft" = 1000
@@ -113,9 +72,9 @@ def test_2_params():
     test_2_params()
 
 
-def test_tuples():
-    @couscous
-    def test_2_params():
+def test_tuples() -> None:
+    @impunity  # type: ignore
+    def test_2_params() -> None:
 
         alt_m: "m" = 1000
         alt_ft: "ft" = 1000
@@ -126,27 +85,19 @@ def test_tuples():
     test_2_params()
 
 
-<<<<<<< HEAD
-def test_different_units():
-    @couscous
+def test_different_units() -> None:
+    @impunity  # type: ignore
     def test_different_units():
         alt_ft: "ft" = 1000
         temp = temperature(alt_ft)
         assert temp == pytest.approx(286.17, rel=1e-1)
 
     test_different_units()
-=======
-@couscous
-def test_different_units():
-    alt_ft: "ft" = 1000
-    temp = temperature(alt_ft)
-    assert temp == pytest.approx(286.17, rel=1e-1)
->>>>>>> it's couscous time !
 
 
-def test_binOp():
-    @couscous
-    def test_binOp():
+def test_binOp() -> None:
+    @impunity  # type: ignore
+    def test_binOp() -> None:
         alt_ft: "ft" = 1000
         temp = temperature(alt_ft * 3)
         assert temp == pytest.approx(286.17, rel=1e-1)
@@ -154,30 +105,29 @@ def test_binOp():
     test_binOp()
 
 
-<<<<<<< HEAD
-def test_call_np():
-    @couscous
+def test_call_np() -> None:
+    @impunity  # type: ignore
     def test_call_np(h: "m") -> "K":
 
         temp_0: "K" = 288.15
-        c: "K/m" = 0.0065
+        c: Annotated[Any, "K/m"] = 0.0065
         temp: "K" = np.maximum(
             temp_0 - c * h,
             216.65,
         )
         return temp
 
-    m: "m" = 11000
-    res = test_call_np(m)
+    m2: "m" = 11000
+    res = test_call_np(m2)
     assert res == pytest.approx(isa.STRATOSPHERE_TEMP, rel=1e-1)
 
 
-def test_using_globals():
-    @couscous
+def test_using_globals() -> None:
+    @impunity  # type: ignore
     def test_using_globals(h: "m") -> "K":
 
         temp_0: "K" = 288.15
-        c: "K/m" = 0.0065
+        c: Annotated[Any, "K/m"] = 0.0065
         e = isa.STRATOSPHERE_TEMP
         temp: "K" = np.maximum(
             temp_0 - c * h,
@@ -185,13 +135,13 @@ def test_using_globals():
         )
         return temp
 
-    m: "m" = 11000
-    res = test_using_globals(m)
+    m2: "m" = 11000
+    res = test_using_globals(m2)
     assert res == pytest.approx(isa.STRATOSPHERE_TEMP, rel=1e-1)
 
 
-def test_wrong_units():
-    @couscous
+def test_wrong_units() -> None:
+    @impunity  # type: ignore
     def test_wrong_units():
         with pytest.raises(pint.errors.DimensionalityError):
             alt_ft: "K" = 1000
@@ -200,26 +150,11 @@ def test_wrong_units():
     test_wrong_units()
 
 
-def test_wrong_received_units():
-    @couscous
-    def test_wrong_units():
+def test_wrong_received_units() -> None:
+    @impunity  # type: ignore
+    def test_wrong_received_units() -> None:
         alt_ft: "ft" = 1000
         with pytest.raises(pint.errors.DimensionalityError):
-            res: "ft" = temperature(alt_ft)
+            res: "ft" = temperature(alt_ft)  # noqa F841
 
-    test_wrong_units()
-=======
-@couscous
-def test_wrong_units():
-    with pytest.raises(pint.errors.DimensionalityError):
-        alt_ft: "K" = 1000
-        temperature(alt_ft)
->>>>>>> it's couscous time !
-
-
-def main():
-    test_wrong_units()
-
-
-if __name__ == "__main__":
-    main()
+    test_wrong_received_units()
