@@ -96,3 +96,6 @@ ENV/
 
 #vs code
 .vscode
+
+# perf file
+tests/test_perf.py

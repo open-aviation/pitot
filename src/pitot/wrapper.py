@@ -1,20 +1,15 @@
 from __future__ import annotations
 
-import ast
 import functools
 import inspect
 import logging
-import textwrap
 from typing import Any, Callable
 
-import astor
 import pandas as pd
 import pint
-import sys
 from pint_pandas import PintArray, PintType
 
 from . import Q_
-from .couscous import Visitor
 
 ReturnQuantity = Callable[..., pint.Quantity]
 
@@ -33,10 +28,8 @@ def default_units(**unit_kw: str | pint.Unit) -> Callable[..., ReturnQuantity]:
             for arg, value in new_args.items():
                 unit = unit_kw.get(arg, None)
 
-                if (
-                    unit is None
-                    or isinstance(value, pint.Quantity)
-                    or isinstance(value, PintArray)
+                if unit is None or isinstance(
+                    value, (pint.Quantity, PintArray)
                 ):
                     continue
 
@@ -62,6 +55,7 @@ def default_units(**unit_kw: str | pint.Unit) -> Callable[..., ReturnQuantity]:
         return decorated_func
 
     return wrapper
+<<<<<<< HEAD
 
 
 def couscous(fun: Callable) -> Callable:
@@ -112,3 +106,5 @@ def couscous(fun: Callable) -> Callable:
     )
 
     return fun
+=======
+>>>>>>> adding impunity to isa

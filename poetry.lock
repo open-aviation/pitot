@@ -275,6 +275,25 @@ files = [
 license = ["ukkonen"]
 
 [[package]]
+name = "impunity"
+version = "0.1.0"
+description = "Static checking for consistency of physical units"
+category = "main"
+optional = false
+python-versions = "^3.8"
+files = []
+develop = true
+
+[package.dependencies]
+astor = "^0.8.1"
+Pint = ">=0.19.2"
+typing-extensions = {version = ">=4.2.0,<5.0.0", markers = "python_version < \"3.10\""}
+
+[package.source]
+type = "directory"
+url = "../impunity"
+
+[[package]]
 name = "iniconfig"
 version = "2.0.0"
 description = "brain-dead simple config-ini parsing"
@@ -869,4 +888,4 @@ testing = ["coverage (>=6.2)", "coverage-enable-subprocess (>=1)", "flaky (>=3.7
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "a5d5471063711bb2cb2c030486e69a95a113c2de5262e0ae350ff801163522af"
+content-hash = "b5ef3166cb825b50bb4026ae0c6370fc05219f0616618878c3ebc1fa926efa3b"

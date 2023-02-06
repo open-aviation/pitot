@@ -1,29 +1,29 @@
 from typing import Any
+
 import pytest
-from pitot.wrapper import couscous
+from impunity import impunity
+from typing_extensions import Annotated
 
-m = K = ft = Any
+m = Annotated[Any, "m"]
+ft = Annotated[Any, "ft"]
+K = Annotated[Any, "K"]
 
 
-def test_mixed_units():
-    @couscous
-    def test_mixed_units():
-        alt_1: "m" = 1000
+def test_mixed_units() -> None:
+    @impunity  # type: ignore
+    def test_mixed_units() -> None:
+        alt_1: m = 1000
         alt_2: "ft" = 350
         temp: "K" = 120
-        result: "m / K" = (alt_1 + alt_2) * 25 / temp
-<<<<<<< HEAD
-=======
-        print(result)
->>>>>>> it's couscous time !
+        result: Annotated[Any, "m / K"] = (alt_1 + alt_2) * 25 / temp
         assert result == pytest.approx(230.55, rel=1e-2)
 
     test_mixed_units()
 
 
-def test_add_operation():
-    @couscous
-    def test_operation():
+def test_add_operation() -> None:
+    @impunity  # type: ignore
+    def test_operation() -> None:
         alt_m: "m" = 1000
         alt_ft: "ft" = 2000
         alt_m2: "m" = 3000
@@ -33,10 +33,10 @@ def test_add_operation():
     test_operation()
 
 
-<<<<<<< HEAD
-def test_dimless_var():
-    @couscous
-    def test_dimless_var():
+def test_dimless_var() -> None:
+    @impunity  # type: ignore
+    def test_dimless_var() -> None:
+
         alt_m: "m" = 1000
         alt_ft: "ft" = 2000
         alt_m2: "m" = 3000
@@ -47,11 +47,10 @@ def test_dimless_var():
     test_dimless_var()
 
 
-=======
->>>>>>> it's couscous time !
-def test_list_operation():
-    @couscous
-    def test_operation():
+def test_list_operation() -> None:
+    @impunity  # type: ignore
+    def test_operation() -> None:
+
         alt_m: "m" = 1000
         alt_ft: "ft" = 2000
         alt_m2: "m" = 3000
