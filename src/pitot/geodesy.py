@@ -7,21 +7,20 @@ from __future__ import annotations
 
 from typing import Any
 
-import pint
+from impunity import impunity  # type: ignore
 from pyproj import Geod
-
-from . import ureg
-from .wrapper import default_units
+from typing_extensions import Annotated
 
 
+@impunity  # type: ignore
 def distance(
-    lat1: float,
-    lon1: float,
-    lat2: float,
-    lon2: float,
-    *args: Any,
-    **kwargs: Any,
-) -> Any:
+    lat1: Annotated[Any, "dimensionless"],
+    lon1: Annotated[Any, "dimensionless"],
+    lat2: Annotated[Any, "dimensionless"],
+    lon2: Annotated[Any, "dimensionless"],
+    *args: Annotated[Any, "dimensionless"],
+    **kwargs: Annotated[Any, "dimensionless"],
+) -> Annotated[Any, "m"]:
     """Computes the distance(s) between two points (or arrays of points).
 
     :param lat1: latitude value(s)
@@ -33,18 +32,20 @@ def distance(
 
     """
     geod = Geod(ellps="WGS84")
-    angle1, angle2, dist1 = geod.inv(lon1, lat1, lon2, lat2, *args, **kwargs)
-    return dist1 * ureg.m
+    dist1: Annotated[Any, "m"]
+    _, _, dist1 = geod.inv(lon1, lat1, lon2, lat2, *args, **kwargs)
+    return dist1
 
 
+@impunity  # type: ignore
 def bearing(
-    lat1: float,
-    lon1: float,
-    lat2: float,
-    lon2: float,
-    *args: Any,
-    **kwargs: Any,
-) -> Any:
+    lat1: Annotated[Any, "dimensionless"],
+    lon1: Annotated[Any, "dimensionless"],
+    lat2: Annotated[Any, "dimensionless"],
+    lon2: Annotated[Any, "dimensionless"],
+    *args: Annotated[Any, "dimensionless"],
+    **kwargs: Annotated[Any, "dimensionless"],
+) -> Annotated[Any, "degree"]:
     """Computes the distance(s) between two points (or arrays of points).
 
     :param lat1: latitude value(s)
@@ -55,19 +56,20 @@ def bearing(
     :return: the bearing angle, in degrees, from the first point to the second
     """
     geod = Geod(ellps="WGS84")
-    angle1, angle2, dist1 = geod.inv(lon1, lat1, lon2, lat2, *args, **kwargs)
+    angle1: Annotated[Any, "degree"]
+    angle1, _, _ = geod.inv(lon1, lat1, lon2, lat2, *args, **kwargs)
     return angle1
 
 
-@default_units(distance="m")
+@impunity  # type: ignore
 def destination(
-    lat: float,
-    lon: float,
-    bearing: float,
-    distance: pint.Quantity,
-    *args: Any,
-    **kwargs: Any,
-) -> Any:
+    lat: Annotated[Any, "dimensionless"],
+    lon: Annotated[Any, "dimensionless"],
+    bearing: Annotated[Any, "dimensionless"],
+    distance: Annotated[Any, "m"],
+    *args: Annotated[Any, "dimensionless"],
+    **kwargs: Annotated[Any, "dimensionless"],
+) -> Annotated[Any, "dimensionless"]:
     """Computes the point you reach from a set of coordinates, moving in a
     given direction for a given distance.
 
@@ -80,9 +82,10 @@ def destination(
         from the destination point back to the origin, all in degrees.
     """
     geod = Geod(ellps="WGS84")
-    lon_, lat_, back_ = geod.fwd(
-        lon, lat, bearing, distance.to("m").m, *args, **kwargs
-    )
+    lon_: Annotated[Any, "dimensionless"]
+    lat_: Annotated[Any, "dimensionless"]
+    back_: Annotated[Any, "dimensionless"]
+    lon_, lat_, back_ = geod.fwd(lon, lat, bearing, distance, *args, **kwargs)
     return lat_, lon_, back_
 
 

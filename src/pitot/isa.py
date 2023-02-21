@@ -1,13 +1,10 @@
 from typing import Any, Tuple
 
 import numpy as np
-from impunity import impunity
+from impunity import impunity  # type: ignore
 from typing_extensions import Annotated
 
 __all__ = ["temperature", "density", "pressure", "sound_speed"]
-
-Pa = s = m = kg = K = J = dimensionless = Any
-
 
 # Cp/Cv for air
 GAMMA: Annotated[float, "dimensionless"] = 1.40

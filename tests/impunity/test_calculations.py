@@ -1,7 +1,7 @@
 from typing import Any
 
 import pytest
-from impunity import impunity
+from impunity import impunity  # type: ignore
 from typing_extensions import Annotated
 
 m = Annotated[Any, "m"]
@@ -12,7 +12,7 @@ K = Annotated[Any, "K"]
 def test_mixed_units() -> None:
     @impunity  # type: ignore
     def test_mixed_units() -> None:
-        alt_1: m = 1000
+        alt_1: "m" = 1000
         alt_2: "ft" = 350
         temp: "K" = 120
         result: Annotated[Any, "m / K"] = (alt_1 + alt_2) * 25 / temp
@@ -36,7 +36,6 @@ def test_add_operation() -> None:
 def test_dimless_var() -> None:
     @impunity  # type: ignore
     def test_dimless_var() -> None:
-
         alt_m: "m" = 1000
         alt_ft: "ft" = 2000
         alt_m2: "m" = 3000
@@ -50,7 +49,6 @@ def test_dimless_var() -> None:
 def test_list_operation() -> None:
     @impunity  # type: ignore
     def test_operation() -> None:
-
         alt_m: "m" = 1000
         alt_ft: "ft" = 2000
         alt_m2: "m" = 3000
