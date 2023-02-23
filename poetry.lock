@@ -276,14 +276,14 @@ license = ["ukkonen"]
 
 [[package]]
 name = "impunity"
-version = "0.2.0"
+version = "0.2.1"
 description = "Static checking for consistency of physical units"
 category = "main"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "impunity-0.2.0-py3-none-any.whl", hash = "sha256:89bf2b38cf041288b678d99ca9258ec065150273fd8e3d569f7f1e8c105015e7"},
-    {file = "impunity-0.2.0.tar.gz", hash = "sha256:c13d69b8b4b6bf2348c2a43feb98321cd2e9e060530b9502549d282b390f6728"},
+    {file = "impunity-0.2.1-py3-none-any.whl", hash = "sha256:6929a80834868935ba4d25726cd5f06ac80352490ed7c139629505b07aac5dad"},
+    {file = "impunity-0.2.1.tar.gz", hash = "sha256:1df3db6e3a5faa2f546cad5a885077adb204d1a8af0ff4462dddbf10ecba9def"},
 ]
 
 [package.dependencies]
@@ -882,4 +882,4 @@ test = ["covdefaults (>=2.2.2)", "coverage (>=7.1)", "coverage-enable-subprocess
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "0856a77bccc2b5cd0a5e9b120e911df16d6aea600c9c31a4b5ef83d4309f2660"
+content-hash = "ca8b71e0ae07039bde3d8d6573a1f17467b30ded069527a17c31b9092c9291c7"

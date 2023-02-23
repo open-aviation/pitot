@@ -51,9 +51,8 @@ def test_geodesy_3() -> None:
     def test_geodesy_3() -> None:
         # running along Greenwich meridian: longitude remains 0
         distance: Annotated[Any, "nmi"] = 60
-        assert destination(0, 0, 90, distance) == pytest.approx(
-            (0, 1, -90), rel=1e-2
-        )
+        res = destination(0, 0, 90, distance)
+        assert res == pytest.approx((0, 1, -90), rel=1e-2)
 
     impunity(test_geodesy_3)()
 

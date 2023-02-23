@@ -5,7 +5,7 @@ All angles are in degrees, all distances are in meter.
 """
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, List, Tuple
 
 from impunity import impunity  # type: ignore
 from pyproj import Geod
@@ -14,10 +14,10 @@ from typing_extensions import Annotated
 
 @impunity  # type: ignore
 def distance(
-    lat1: Annotated[Any, "dimensionless"],
-    lon1: Annotated[Any, "dimensionless"],
-    lat2: Annotated[Any, "dimensionless"],
-    lon2: Annotated[Any, "dimensionless"],
+    lat1: Annotated[Any, "degree"],
+    lon1: Annotated[Any, "degree"],
+    lat2: Annotated[Any, "degree"],
+    lon2: Annotated[Any, "degree"],
     *args: Annotated[Any, "dimensionless"],
     **kwargs: Annotated[Any, "dimensionless"],
 ) -> Annotated[Any, "m"]:
@@ -39,10 +39,10 @@ def distance(
 
 @impunity  # type: ignore
 def bearing(
-    lat1: Annotated[Any, "dimensionless"],
-    lon1: Annotated[Any, "dimensionless"],
-    lat2: Annotated[Any, "dimensionless"],
-    lon2: Annotated[Any, "dimensionless"],
+    lat1: Annotated[Any, "degree"],
+    lon1: Annotated[Any, "degree"],
+    lat2: Annotated[Any, "degree"],
+    lon2: Annotated[Any, "degree"],
     *args: Annotated[Any, "dimensionless"],
     **kwargs: Annotated[Any, "dimensionless"],
 ) -> Annotated[Any, "degree"]:
@@ -63,13 +63,15 @@ def bearing(
 
 @impunity  # type: ignore
 def destination(
-    lat: Annotated[Any, "dimensionless"],
-    lon: Annotated[Any, "dimensionless"],
-    bearing: Annotated[Any, "dimensionless"],
+    lat: Annotated[Any, "degree"],
+    lon: Annotated[Any, "degree"],
+    bearing: Annotated[Any, "degree"],
     distance: Annotated[Any, "m"],
     *args: Annotated[Any, "dimensionless"],
     **kwargs: Annotated[Any, "dimensionless"],
-) -> Annotated[Any, "dimensionless"]:
+) -> Tuple[
+    Annotated[Any, "degree"], Annotated[Any, "degree"], Annotated[Any, "degree"]
+]:
     """Computes the point you reach from a set of coordinates, moving in a
     given direction for a given distance.
 
@@ -82,21 +84,21 @@ def destination(
         from the destination point back to the origin, all in degrees.
     """
     geod = Geod(ellps="WGS84")
-    lon_: Annotated[Any, "dimensionless"]
-    lat_: Annotated[Any, "dimensionless"]
-    back_: Annotated[Any, "dimensionless"]
+    lon_: Annotated[Any, "degree"]
+    lat_: Annotated[Any, "degree"]
+    back_: Annotated[Any, "degree"]
     lon_, lat_, back_ = geod.fwd(lon, lat, bearing, distance, *args, **kwargs)
     return lat_, lon_, back_
 
 
 def greatcircle(
-    lat1: float,
-    lon1: float,
-    lat2: float,
-    lon2: float,
-    *args: Any,
-    **kwargs: Any,
-) -> Any:
+    lat1: Annotated[Any, "degree"],
+    lon1: Annotated[Any, "degree"],
+    lat2: Annotated[Any, "degree"],
+    lon2: Annotated[Any, "degree"],
+    *args: Annotated[Any, "dimensionless"],
+    **kwargs: Annotated[Any, "dimensionless"],
+) -> List[Annotated[Any, "degree"]]:
     """Computes a list of points making the great circle between two points.
 
     :param lat1: latitude value
