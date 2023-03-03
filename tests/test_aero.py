@@ -1,14 +1,23 @@
+from __future__ import annotations
+
+import pytest
+from impunity import impunity
 # import numpy as np
-# import pytest
+from typing_extensions import Annotated
 
-# from pitot import aero
-
+from pitot import aero
 
 # def test_aero() -> None:
 
-# # https://fr.wikipedia.org/wiki/Nombre_de_Mach
-# r1 = aero.mach2tas(1, [0, 1000])
-# assert r1 == pytest.approx([340.3, 336.4], rel=1e-2)
+
+@impunity
+def test_mach2tas() -> None:
+    # https://fr.wikipedia.org/wiki/Nombre_de_Mach
+    alt: Annotated[list[float], "m"] = [0, 1000]
+    r1 = aero.mach2tas(1, alt)
+    r2: Annotated[list[float], "kts"] = [340.3, 336.4]
+    assert r1 == pytest.approx(r2, rel=1e-2)
+
 
 # # https://en.wikipedia.org/wiki/Mach_number
 # r2 = aero.mach2tas([0.8, 1.2, 5, 10], 0)

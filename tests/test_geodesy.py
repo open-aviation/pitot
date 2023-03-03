@@ -2,7 +2,7 @@ from typing import Any
 
 import numpy as np
 import pytest
-from impunity import impunity  # type: ignore
+from impunity import impunity
 from typing_extensions import Annotated
 
 from pitot.geodesy import bearing, destination, distance, greatcircle
@@ -16,75 +16,66 @@ nmi = Annotated[Any, "nmi"]
 m = Annotated[Any, "m"]
 
 
-def test_geodesy_0() -> None:
-    def test_geodesy_0() -> None:
-        dist_nautical: Annotated[Any, "nmi"] = 1
-        dist_meters: Annotated[Any, "m"] = dist_nautical
-        assert (
-            pytest.approx(
-                distance(zero, zero, lat2=zero, lon2=value_1),
-                rel=1e-2,
-            )
-            == dist_meters
+@impunity
+def test_nautical_miles() -> None:
+    dist_nautical: Annotated[Any, "nmi"] = 1
+    dist_meters: Annotated[Any, "m"] = dist_nautical
+    assert (
+        pytest.approx(
+            distance(zero, zero, lat2=zero, lon2=value_1),
+            rel=1e-2,
         )
-
-    impunity(test_geodesy_0)()
-
-
-def test_geodesy_1() -> None:
-    def test_geodesy_1() -> None:
-        # pointing to the East
-        assert bearing(zero, zero, lon2=value_2, lat2=zero) == 90.0
-
-    impunity(test_geodesy_1)()
+        == dist_meters
+    )
 
 
-def test_geodesy_2() -> None:
-    def test_geodesy_2() -> None:
-        # running along Greenwich meridian: longitude remains 0
-        assert destination(zero, zero, zero, value_3)[1] == 0
-
-    impunity(test_geodesy_2)()
+@impunity
+def test_equator_bearing() -> None:
+    # pointing to the East
+    assert bearing(zero, zero, lon2=value_2, lat2=zero) == 90.0
 
 
-def test_geodesy_3() -> None:
-    def test_geodesy_3() -> None:
-        # running along Greenwich meridian: longitude remains 0
-        distance: Annotated[Any, "nmi"] = 60
-        res = destination(0, 0, 90, distance)
-        assert res == pytest.approx((0, 1, -90), rel=1e-2)
-
-    impunity(test_geodesy_3)()
+@impunity
+def test_equator_destination() -> None:
+    # running along Greenwich meridian: longitude remains 0
+    assert destination(zero, zero, zero, value_3)[1] == 0
 
 
-def test_geodesy_4() -> None:
-    def test_geodesy_4() -> None:
-        distance: Annotated[Any, "nmi"] = 60
-        assert destination(0, 0, 90, distance) == pytest.approx(
-            (0, 1, -90), rel=1e-2
-        )
-
-    impunity(test_geodesy_4)()
+@impunity
+def test_destination_equator() -> None:
+    # running along Greenwich meridian: longitude remains 0
+    distance: Annotated[Any, "nmi"] = 60
+    res = destination(0, 0, 90, distance)
+    assert res == pytest.approx((0, 1, -90), rel=1e-2)
 
 
-def test_geodesy_5() -> None:
-    def test_geodesy_5() -> None:
-        x = np.stack(greatcircle(0, 0, 0, 45, 44))
-        assert sum(x[:, 0]) == 0
-        assert sum(x[:, 1]) == 45 * 22
+@impunity
+def test_destination_nmi() -> None:
+    distance: Annotated[Any, "nmi"] = 60
+    assert destination(0, 0, 90, distance) == pytest.approx(
+        (0, 1, -90), rel=1e-2
+    )
 
-    impunity(test_geodesy_5)()
+
+@impunity
+def test_greatcircle() -> None:
+    x = np.stack(greatcircle(0, 0, 0, 45, 44))
+    assert sum(x[:, 0]) == 0
+    assert sum(x[:, 1]) == 45 * 22
 
 
-def test_geodesy_6() -> None:
-    def test_geodesy_6() -> None:
-        x = np.stack(greatcircle(0, 0, 0, 45, 44))
+@impunity
+def test_greatcircle_distance() -> None:
+    x = np.stack(greatcircle(0, 0, 0, 45, 44))
 
-        # Vector version
-        d = distance(x[1:, 0], x[1:, 1], x[:-1, 0], x[:-1, 1])
-        assert d.max() == pytest.approx(d.min())
+    # Vector version
+    d = distance(x[1:, 0], x[1:, 1], x[:-1, 0], x[:-1, 1])
+    assert d.max() == pytest.approx(d.min())
 
-        # b = bearing(x[:-1, 0], x[:-1, 1], x[1:, 0], x[1:, 1])
-        # assert b.max() == pytest.approx(b.min())
 
-    impunity(test_geodesy_6)()
+@impunity
+def test_greatcircle_bearing() -> None:
+    x = np.stack(greatcircle(0, 0, 0, 45, 44))
+
+    b = bearing(x[:-1, 0], x[:-1, 1], x[1:, 0], x[1:, 1])
+    assert b.max() == pytest.approx(b.min())

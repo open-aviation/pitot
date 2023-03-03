@@ -1,12 +1,10 @@
 from typing import Any
 
 import numpy as np
-from impunity import impunity  # type: ignore
+from impunity import impunity
 from typing_extensions import Annotated
 
 from . import isa
-
-# from .isa import P_0, RHO_0, atmosphere, density, sound_speed
 
 __all__ = [
     "tas2mach",
@@ -20,7 +18,7 @@ __all__ = [
 ]
 
 
-@impunity  # type: ignore
+@impunity
 def tas2mach(
     tas: Annotated[Any, "kts"], h: Annotated[Any, "ft"]
 ) -> Annotated[Any, "dimensionless"]:
@@ -30,12 +28,12 @@ def tas2mach(
 
     :return: Mach number (dimensionless)
     """
-    a: Annotated[Any, "m/s"] = isa.sound_speed(h)
+    a = isa.sound_speed(h)
     M: Annotated[Any, "dimensionless"] = tas / a
     return M
 
 
-@impunity  # type: ignore
+@impunity
 def mach2tas(
     M: Annotated[Any, "dimensionless"], h: Annotated[Any, "ft"]
 ) -> Annotated[Any, "kts"]:
@@ -45,12 +43,12 @@ def mach2tas(
 
     :param tas: True Air Speed, (in kts)
     """
-    a: Annotated[Any, "m/s"] = isa.sound_speed(h)
+    a = isa.sound_speed(h)
     tas: Annotated[Any, "kts"] = M * a
     return tas
 
 
-@impunity  # type: ignore
+@impunity
 def eas2tas(
     eas: Annotated[Any, "kts"], h: Annotated[Any, "ft"]
 ) -> Annotated[Any, "kts"]:
@@ -60,12 +58,12 @@ def eas2tas(
 
     :return: True Air Speed, (in kts)
     """
-    rho: Annotated[Any, "kg * m^-3"] = isa.density(h)
+    rho = isa.density(h)
     tas: Annotated[Any, "kts"] = eas * np.sqrt(isa.RHO_0 / rho)
     return tas
 
 
-@impunity  # type: ignore
+@impunity
 def tas2eas(
     tas: Annotated[Any, "kts"], h: Annotated[Any, "ft"]
 ) -> Annotated[Any, "kts"]:
@@ -75,12 +73,12 @@ def tas2eas(
 
     :return: Equivalent Air Speed, (in kts)
     """
-    rho: Annotated[Any, "kg * m^-3"] = isa.density(h)
+    rho = isa.density(h)
     eas: Annotated[Any, "kts"] = tas * np.sqrt(rho / isa.RHO_0)
     return eas
 
 
-@impunity  # type: ignore
+@impunity
 def cas2tas(
     cas: Annotated[Any, "kts"], h: Annotated[Any, "ft"]
 ) -> Annotated[Any, "kts"]:
@@ -101,7 +99,7 @@ def cas2tas(
     return tas
 
 
-@impunity  # type: ignore
+@impunity
 def tas2cas(
     tas: Annotated[Any, "kts"], h: Annotated[Any, "ft"]
 ) -> Annotated[Any, "kts"]:
@@ -123,7 +121,7 @@ def tas2cas(
     return cas
 
 
-@impunity  # type: ignore
+@impunity
 def mach2cas(
     M: Annotated[Any, "dimensionless"], h: Annotated[Any, "ft"]
 ) -> Annotated[Any, "kts"]:
@@ -133,12 +131,12 @@ def mach2cas(
 
     :return: Computed Air Speed, (in kts)
     """
-    tas: Annotated[Any, "kts"] = mach2tas(M, h)
-    cas: Annotated[Any, "kts"] = tas2cas(tas, h)
+    tas = mach2tas(M, h)
+    cas = tas2cas(tas, h)
     return cas
 
 
-@impunity  # type: ignore
+@impunity
 def cas2mach(
     cas: Annotated[Any, "kts"], h: Annotated[Any, "ft"]
 ) -> Annotated[Any, "dimensionless"]:
@@ -149,5 +147,5 @@ def cas2mach(
     :return: Mach number (dimensionless)
     """
     tas = cas2tas(cas, h)
-    M: Annotated[Any, "dimensionless"] = tas2mach(tas, h)
+    M = tas2mach(tas, h)
     return M
