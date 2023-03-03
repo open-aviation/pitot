@@ -8,8 +8,9 @@ from __future__ import annotations
 from typing import Any, List, Tuple
 
 from impunity import impunity  # type: ignore
-from pyproj import Geod
 from typing_extensions import Annotated
+
+from pyproj import Geod
 
 
 @impunity  # type: ignore

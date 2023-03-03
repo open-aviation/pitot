@@ -1,13 +1,13 @@
 import logging
 from typing import Any, Tuple
 
-import numpy as np
 import pytest
 from impunity import impunity  # type: ignore
-from typing_extensions import Annotated
-
 from pitot import isa
 from pitot.isa import temperature
+from typing_extensions import Annotated
+
+import numpy as np
 
 m = Annotated[Any, "m"]
 ft = Annotated[Any, "ft"]

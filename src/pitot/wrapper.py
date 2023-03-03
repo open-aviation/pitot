@@ -5,9 +5,10 @@ import inspect
 import logging
 from typing import Any, Callable
 
-import pandas as pd
 import pint
 from pint_pandas import PintArray, PintType
+
+import pandas as pd
 
 from . import Q_
 

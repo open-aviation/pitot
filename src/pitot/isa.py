@@ -1,8 +1,9 @@
 from typing import Any, Tuple
 
-import numpy as np
 from impunity import impunity  # type: ignore
 from typing_extensions import Annotated
+
+import numpy as np
 
 __all__ = ["temperature", "density", "pressure", "sound_speed"]
 

@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import pytest
 from impunity import impunity
+from pitot import aero
+
 # import numpy as np
 from typing_extensions import Annotated
-
-from pitot import aero
 
 # def test_aero() -> None:
 

@@ -1,8 +1,9 @@
 from typing import Any
 
-import numpy as np
 from impunity import impunity
 from typing_extensions import Annotated
+
+import numpy as np
 
 from . import isa
 

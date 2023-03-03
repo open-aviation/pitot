@@ -1,8 +1,9 @@
 from typing import Sequence, Union
 
+import pint
+
 import numpy as np
 import numpy.typing as npt
-import pint
 
 Scalar = Union[int, float, np.float_]
 QuantityOrScalar = Union[Scalar, pint.Quantity]
