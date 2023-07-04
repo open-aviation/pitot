@@ -1,11 +1,13 @@
 from typing import Any, Tuple
 
-from impunity import impunity  # type: ignore
+from impunity import impunity
 from typing_extensions import Annotated
 
 import numpy as np
 
 __all__ = ["temperature", "density", "pressure", "sound_speed"]
+
+m = Annotated[Any, "meters"]
 
 # Cp/Cv for air
 GAMMA: Annotated[float, "dimensionless"] = 1.40
@@ -25,9 +27,11 @@ BETA_T: Annotated[float, "K / m"] = -0.0065
 TROPOPAUSE_PRESS: Annotated[float, "Pa"] = 22632.0401
 # tropopause altitude
 H_TROP: Annotated[int, "m"] = 11000
+# sea level altitude
+SEA_ALT: Annotated[Any, "m"] = 0
 
 
-@impunity  # type: ignore
+@impunity
 def temperature(h: Annotated[Any, "m"]) -> Annotated[Any, "K"]:
     """Temperature of ISA atmosphere
 
@@ -47,7 +51,7 @@ def temperature(h: Annotated[Any, "m"]) -> Annotated[Any, "K"]:
     return temp
 
 
-@impunity  # type: ignore
+@impunity
 def density(h: Annotated[Any, "m"]) -> Annotated[Any, "kg * m^-3"]:
     """Density of ISA atmosphere
 
@@ -58,8 +62,9 @@ def density(h: Annotated[Any, "m"]) -> Annotated[Any, "kg * m^-3"]:
 
     """
     temp: Annotated[Any, "K"] = temperature(h)
+    temp_0: Annotated[Any, "K"] = 288.15
     density_troposphere: Annotated[Any, "kg * m^-3"] = (
-        RHO_0 * (temp / 288.15) ** 4.256848
+        RHO_0 * (temp / temp_0) ** 4.256848
     )
     delta: Annotated[Any, "dimensionless"] = np.maximum(0, h - H_TROP)
     density: Annotated[Any, "kg * m^-3"] = density_troposphere * np.exp(
@@ -68,7 +73,7 @@ def density(h: Annotated[Any, "m"]) -> Annotated[Any, "kg * m^-3"]:
     return density
 
 
-@impunity  # type: ignore
+@impunity
 def pressure(h: Annotated[Any, "m"]) -> Annotated[Any, "Pa"]:
     """Pressure of ISA atmosphere
 
@@ -79,8 +84,8 @@ def pressure(h: Annotated[Any, "m"]) -> Annotated[Any, "Pa"]:
 
     """
     temp: Annotated[Any, "K"] = temperature(h)
-    temp_0: Annotated[Any, "K"] = temperature(0)
-    delta = np.maximum(0, h - H_TROP)
+    temp_0: Annotated[Any, "K"] = temperature(SEA_ALT)
+    delta: Annotated[Any, "dimensionless"] = np.maximum(0, h - H_TROP)
 
     press: Annotated[Any, "Pa"] = np.where(
         h < H_TROP,
@@ -90,7 +95,7 @@ def pressure(h: Annotated[Any, "m"]) -> Annotated[Any, "Pa"]:
     return press
 
 
-@impunity  # type: ignore
+@impunity
 def atmosphere(
     h: Annotated[Any, "m"]
 ) -> Tuple[
@@ -108,14 +113,16 @@ def atmosphere(
         288.15 - 0.0065 * h,
         STRATOSPHERE_TEMP,
     )
+    temp_0: Annotated[Any, "K"] = temperature(SEA_ALT)
+
     density_troposphere: Annotated[Any, "kg * m^-3"] = (
-        RHO_0 * (temp / 288.15) ** 4.256848
+        RHO_0 * (temp / temp_0) ** 4.256848
     )
     delta: Annotated[Any, "dimensionless"] = np.maximum(0, h - 11000)
     den: Annotated[Any, "kg * m^-3"] = density_troposphere * np.exp(
         -delta / 6341.5522
     )
-    temp_0: Annotated[Any, "K"] = temperature(0)
+    temp_0: Annotated[Any, "K"] = temperature(SEA_ALT)
     press: Annotated[Any, "Pa"] = np.where(
         h < H_TROP,
         P_0 * (temp / temp_0) ** (-G_0 / (BETA_T * R)),
@@ -124,7 +131,7 @@ def atmosphere(
     return press, den, temp
 
 
-@impunity  # type: ignore
+@impunity
 def sound_speed(h: Annotated[Any, "m"]) -> Annotated[Any, "m/s"]:
     """Speed of sound in ISA atmosphere
 

@@ -7,13 +7,13 @@ from __future__ import annotations
 
 from typing import Any, List, Tuple
 
-from impunity import impunity  # type: ignore
+from impunity import impunity
 from typing_extensions import Annotated
 
 from pyproj import Geod
 
 
-@impunity  # type: ignore
+@impunity
 def distance(
     lat1: Annotated[Any, "degree"],
     lon1: Annotated[Any, "degree"],
@@ -38,7 +38,7 @@ def distance(
     return dist1
 
 
-@impunity  # type: ignore
+@impunity
 def bearing(
     lat1: Annotated[Any, "degree"],
     lon1: Annotated[Any, "degree"],
@@ -62,7 +62,7 @@ def bearing(
     return angle1
 
 
-@impunity  # type: ignore
+@impunity
 def destination(
     lat: Annotated[Any, "degree"],
     lon: Annotated[Any, "degree"],
@@ -92,6 +92,7 @@ def destination(
     return lat_, lon_, back_
 
 
+@impunity
 def greatcircle(
     lat1: Annotated[Any, "degree"],
     lon1: Annotated[Any, "degree"],
