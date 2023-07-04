@@ -737,7 +737,7 @@ description = "Static checking for consistency of physical units"
 optional = false
 python-versions = "^3.8"
 files = []
-develop = true
+develop = false
 
 [package.dependencies]
 astor = "^0.8.1"
@@ -747,8 +747,10 @@ sphinx-design = "^0.4.1"
 typing-extensions = {version = ">=4.2.0,<5.0.0", markers = "python_version < \"3.10\""}
 
 [package.source]
-type = "directory"
-url = "../impunity"
+type = "git"
+url = "https://github.com/achevrot/impunity"
+reference = "HEAD"
+resolved_reference = "3da137095e14eaae5bfd9b1dfd5cc0b52e7d3498"
 
 [[package]]
 name = "iniconfig"
@@ -2280,4 +2282,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "e0e6892a04925ec1b16024c97f7760fc6cf720422582fe5e62dbd69804c37545"
+content-hash = "42a006b761748d8015f2cccfbab5272369936c50d12dd529f997cc872eb7d8ef"
