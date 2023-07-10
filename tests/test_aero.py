@@ -3,7 +3,8 @@ from __future__ import annotations
 import unittest
 
 from impunity import impunity
-from pitot import aero, isa
+from pitot import aero
+from pitot import isa
 from typing_extensions import Annotated
 
 import numpy as np

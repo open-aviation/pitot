@@ -1,10 +1,11 @@
 from typing import Any
 
-import isa
 from impunity import impunity
 from typing_extensions import Annotated
 
 import numpy as np
+
+from . import isa
 
 __all__ = [
     "tas2mach",
@@ -88,10 +89,13 @@ def cas2tas(
 
     :return: True Air Speed, (in kts)
     """
-
-    a = isa.sound_speed(h)
-    M = cas2mach(cas, h)
-    tas = a * M
+    p, rho, _temp = isa.atmosphere(h)
+    qdyn: Annotated[Any, "Pa"] = isa.P_0 * (
+        (1.0 + isa.RHO_0 * cas * cas / (7.0 * isa.P_0)) ** 3.5 - 1.0
+    )
+    tas: Annotated[Any, "m/s"] = np.sqrt(
+        7.0 * p / rho * ((1.0 + qdyn / p) ** (2.0 / 7.0) - 1.0)
+    )
     tas = np.where(cas < 0, -1 * tas, tas)
     return tas
 
@@ -106,9 +110,14 @@ def tas2cas(
 
     :return: Computed Air Speed, (in kts)
     """
-
-    M = tas2mach(tas, h)
-    cas: Annotated[Any, "kts"] = mach2cas(M, h)
+    p, rho, _temp = isa.atmosphere(h)
+    qdyn = p * ((1.0 + rho * tas * tas / (7.0 * p)) ** 3.5 - 1.0)
+    cas: Annotated[Any, "m/s"] = np.sqrt(
+        7.0
+        * isa.P_0
+        / isa.RHO_0
+        * ((qdyn / isa.P_0 + 1.0) ** (2.0 / 7.0) - 1.0)
+    )
     cas = np.where(tas < 0, -1 * cas, cas)
     return cas
 
@@ -123,14 +132,8 @@ def mach2cas(
 
     :return: Computed Air Speed, (in kts)
     """
-
-    p, _, _ = isa.atmosphere(h)
-    a_0 = isa.sound_speed(isa.SEA_ALT)
-    qdyn = p * ((1.0 + M**2 / 5.0) ** 3.5 - 1.0)
-    cas: Annotated[Any, "kts"] = a_0 * np.sqrt(
-        5.0 * ((1.0 + qdyn / isa.P_0) ** (2.0 / 7.0) - 1.0)
-    )
-
+    tas = mach2tas(M, h)
+    cas = tas2cas(tas, h)
     return cas
 
 
@@ -144,12 +147,6 @@ def cas2mach(
 
     :return: Mach number (dimensionless)
     """
-
-    p, _, _ = isa.atmosphere(h)
-    a_0 = isa.sound_speed(isa.SEA_ALT)
-    qdyn = isa.P_0 * ((1.0 + (cas / a_0) ** 2 / 5.0) ** 3.5 - 1.0)
-    M: Annotated[Any, "kts"] = np.sqrt(
-        5.0 * ((1.0 + qdyn / p) ** (2.0 / 7.0) - 1.0)
-    )
-
+    tas = cas2tas(cas, h)
+    M = tas2mach(tas, h)
     return M
