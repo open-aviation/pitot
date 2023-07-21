@@ -1,70 +1,79 @@
-# flake8: noqa
-
 from typing import Any, Sequence, overload
 
-import pint
+from typing_extensions import Annotated
 
-from .types import Array, QuantityOrArray, QuantityOrScalar
+import numpy as np
+import numpy.typing as npt
 
 @overload
 def distance(
-    lat1: float,
-    lon1: float,
-    lat2: float,
-    lon2: float,
+    lat1: Annotated[float, "degree"],
+    lon1: Annotated[float, "degree"],
+    lat2: Annotated[float, "degree"],
+    lon2: Annotated[float, "degree"],
     *args: Any,
     **kwargs: Any,
-) -> pint.Quantity: ...
+) -> Annotated[float, "m"]: ...
 @overload
 def distance(
-    lat1: Sequence[float] | Array,
-    lon1: Sequence[float] | Array,
-    lat2: Sequence[float] | Array,
-    lon2: Sequence[float] | Array,
+    lat1: Annotated[Sequence[float] | npt.NDArray[np.float64], "degree"],
+    lon1: Annotated[Sequence[float] | npt.NDArray[np.float64], "degree"],
+    lat2: Annotated[Sequence[float] | npt.NDArray[np.float64], "degree"],
+    lon2: Annotated[Sequence[float] | npt.NDArray[np.float64], "degree"],
     *args: Any,
     **kwargs: Any,
-) -> pint.Quantity: ...
+) -> Annotated[npt.NDArray[np.float64], "m"]: ...
 @overload
 def bearing(
-    lat1: float,
-    lon1: float,
-    lat2: float,
-    lon2: float,
+    lat1: Annotated[float, "degree"],
+    lon1: Annotated[float, "degree"],
+    lat2: Annotated[float, "degree"],
+    lon2: Annotated[float, "degree"],
     *args: Any,
     **kwargs: Any,
-) -> float: ...
+) -> Annotated[float, "degree"]: ...
 @overload
 def bearing(
-    lat1: Sequence[float] | Array,
-    lon1: Sequence[float] | Array,
-    lat2: Sequence[float] | Array,
-    lon2: Sequence[float] | Array,
+    lat1: Annotated[Sequence[float] | npt.NDArray[np.float64], "degree"],
+    lon1: Annotated[Sequence[float] | npt.NDArray[np.float64], "degree"],
+    lat2: Annotated[Sequence[float] | npt.NDArray[np.float64], "degree"],
+    lon2: Annotated[Sequence[float] | npt.NDArray[np.float64], "degree"],
     *args: Any,
     **kwargs: Any,
-) -> Array: ...
+) -> Annotated[npt.NDArray[np.float64], "degree"]: ...
 @overload
 def destination(
-    lat: float,
-    lon: float,
-    bearing: float,
-    distance: QuantityOrScalar,
+    lat: Annotated[float, "degree"],
+    lon: Annotated[float, "degree"],
+    bearing: Annotated[float, "degree"],
+    distance: Annotated[float, "m"],
     *args: Any,
     **kwargs: Any,
-) -> tuple[float, float, float]: ...
+) -> tuple[
+    Annotated[float, "degree"],
+    Annotated[float, "degree"],
+    Annotated[float, "degree"],
+]: ...
 @overload
 def destination(
-    lat: Sequence[float] | Array,
-    lon: Sequence[float] | Array,
-    bearing: Sequence[float] | Array,
-    distance: QuantityOrArray,
+    lon: Annotated[Sequence[float] | npt.NDArray[np.float64], "degree"],
+    lat: Annotated[Sequence[float] | npt.NDArray[np.float64], "degree"],
+    bearing: Annotated[
+        float | Sequence[float] | npt.NDArray[np.float64], "degree"
+    ],
+    distance: Annotated[float | Sequence[float] | npt.NDArray[np.float64], "m"],
     *args: Any,
     **kwargs: Any,
-) -> tuple[Array, Array, Array]: ...
+) -> tuple[
+    Annotated[npt.NDArray[np.float64], "degree"],
+    Annotated[npt.NDArray[np.float64], "degree"],
+    Annotated[npt.NDArray[np.float64], "degree"],
+]: ...
 def greatcircle(
-    lat1: float,
-    lon1: float,
-    lat2: float,
-    lon2: float,
+    lat1: Annotated[float, "degree"],
+    lon1: Annotated[float, "degree"],
+    lat2: Annotated[float, "degree"],
+    lon2: Annotated[float, "degree"],
     *args: Any,
     **kwargs: Any,
-) -> list[tuple[float, float]]: ...
+) -> list[tuple[Annotated[float, "degree"], Annotated[float, "degree"]]]: ...

@@ -71,7 +71,9 @@ def destination(
     *args: Annotated[Any, "dimensionless"],
     **kwargs: Annotated[Any, "dimensionless"],
 ) -> Tuple[
-    Annotated[Any, "degree"], Annotated[Any, "degree"], Annotated[Any, "degree"]
+    Annotated[Any, "degree"],
+    Annotated[Any, "degree"],
+    Annotated[Any, "degree"],
 ]:
     """Computes the point you reach from a set of coordinates, moving in a
     given direction for a given distance.

@@ -99,7 +99,9 @@ def pressure(h: Annotated[Any, "m"]) -> Annotated[Any, "Pa"]:
 def atmosphere(
     h: Annotated[Any, "m"]
 ) -> Tuple[
-    Annotated[Any, "Pa"], Annotated[Any, "kg * m^-3"], Annotated[Any, "K"]
+    Annotated[Any, "Pa"],
+    Annotated[Any, "kg * m^-3"],
+    Annotated[Any, "K"],
 ]:
     """Pressure of ISA atmosphere
 
@@ -122,7 +124,6 @@ def atmosphere(
     den: Annotated[Any, "kg * m^-3"] = density_troposphere * np.exp(
         -delta / 6341.5522
     )
-    temp_0: Annotated[Any, "K"] = temperature(SEA_ALT)
     press: Annotated[Any, "Pa"] = np.where(
         h < H_TROP,
         P_0 * (temp / temp_0) ** (-G_0 / (BETA_T * R)),
