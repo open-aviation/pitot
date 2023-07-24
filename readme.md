@@ -20,7 +20,7 @@ Implementations are:
 
 The following functions are currently available:
 
-- International Standard Atmosphere (temperature, density, pressure and speed of sound);
+- International Standard Atmosphere (temperature, density, pressure, and speed of sound);
 - conversions between various air speeds: CAS, TAS, EAS and Mach number;
 - geodetic calculations (distance, bearing, great circle, etc.) on a WGS84 ellipsoid.
 
@@ -44,13 +44,13 @@ poetry install
 
 Any input, feedback, bug report or contribution is welcome.
 
-Before opening a PR, please check your commits follow a number of safeguards with hooks to install as follow:
+Before opening a PR, please check your commits follow a number of safeguards with hooks to install as follows:
 
 ```sh
 poetry run pre-commit install
 ```
 
-Then you should prefix you `git commit` commands as follow:
+Then you should prefix you `git commit` commands as follows:
 
 ```sh
 poetry run git commit -m "fantastic commit message"
