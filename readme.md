@@ -16,8 +16,7 @@ Implementations are:
 
 - **efficient**, based on NumPy or state-of-the-art libraries;
 - provided with **typing stubs**;
-- unambiguous with **physical units**, with the help of the [`pint`](https://pint.readthedocs.io/) library.  
-  All parameters may be passed with or without a physical unit (default units are explicit in the documentation), but all return values come with a physical unit.
+- unambiguous with **physical units**, with the help of the [`impunity`](https://achevrot.github.io/impunity/) library, based on annotations.
 
 The following functions are currently available:
 
@@ -40,57 +39,6 @@ poetry install
 ```
 
 ## Basic usage
-
-Physical units are not mandatory for arguments, but return values are all [`pint`](https://pint.readthedocs.io/) quantities
-
-```pycon
->>> from pitot.isa import temperature
->>> temperature(0)
-Default unit [m] will be used for argument 'h'.
-<Quantity(288.15, 'kelvin')>
->>> temperature([0, 1000])
-Default unit [m] will be used for argument 'h'.
-<Quantity([288.15 281.65], 'kelvin')>
-```
-
-You may access the value with the `m` (stands for _magnitude_) attribute:
-
-```pycon
->>> temperature(0).m  # in Kelvin by default
-Default unit [m] will be used for argument 'h'.
-288.15
->>> temperature(0).to("°C").m
-Default unit [m] will be used for argument 'h'.
-15.0
-```
-
-It is preferable to avoid warnings by passing values with a physical unit:
-
-```pycon
->>> from pitot import Q_
->>> temperature(Q_([0, 1000], "ft")).to("°C")
-<Quantity([15.     13.0188], 'degree_Celsius')>
-```
-
-Things also work with NumPy arrays...
-
-```pycon
->>> import numpy as np
->>> temperature(Q_(np.array([0, 1000]), "ft"))
-<Quantity([288.15   286.1688], 'kelvin')>
->>> temperature(Q_(np.array([0, 1000]), "ft")).to("°C").m
-array([15.    , 13.0188])
-```
-
-... or with Pandas Series:
-
-```pycon
->>> import pandas as pd
->>> temperature(pd.Series([0., 1000], dtype="pint[ft]")).pint.to("°C")
-0                  15.0
-1    13.018799999999999
-dtype: pint[°C]
-```
 
 ## Contributions
 
