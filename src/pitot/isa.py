@@ -1,28 +1,38 @@
 from typing import Any, Tuple
 
-import numpy as np
-import pint
+from impunity import impunity
+from typing_extensions import Annotated
 
-from . import Q_, ureg
-from .wrapper import default_units
+import numpy as np
 
 __all__ = ["temperature", "density", "pressure", "sound_speed"]
 
+m = Annotated[Any, "meters"]
 
-GAMMA = Q_(1.40, "dimensionless")  # Cp/Cv for air
-P_0 = Q_(101325.0, "Pa")  # sea level pressure ISA
-R = Q_(287.05287, "m^2 / (s^2 * K)")  # gas constant, sea level ISA
-RHO_0 = Q_(1.225, "kg / m^3")  # sea level density ISA
-SPECIFIC_GAS_CONSTANT = Q_(287.05287, "J/kg/K")
-STRATOSPHERE_TEMP = Q_(216.65, "K")  # until altitude = 22km
-G_0 = Q_(9.80665, "m / s^2")  # Gravitational acceleration
-BETA_T = Q_(-0.0065, "K / m")  # Temperature gradient below tropopause, ISA
-TROPOPAUSE_PRESS = Q_(22632.0401, "Pa")  # pressure at tropopause, ISA
-H_TROP = Q_(11000, "m")  # tropopause altitude
+# Cp/Cv for air
+GAMMA: Annotated[float, "dimensionless"] = 1.40
+# sea level pressure ISA
+P_0: Annotated[float, "Pa"] = 101325.0
+# gas constant, sea level ISA
+R: Annotated[float, "m^2 / (s^2 * K)"] = 287.05287
+# sea level density ISA
+RHO_0: Annotated[float, "kg / m^3"] = 1.225
+# until altitude = 22km
+STRATOSPHERE_TEMP: Annotated[float, "K"] = 216.65
+# Gravitational acceleration
+G_0: Annotated[float, "m / s^2"] = 9.80665
+# Temperature gradient below tropopause, ISA
+BETA_T: Annotated[float, "K / m"] = -0.0065
+# pressure at tropopause, ISA
+TROPOPAUSE_PRESS: Annotated[float, "Pa"] = 22632.0401
+# tropopause altitude
+H_TROP: Annotated[int, "m"] = 11000
+# sea level altitude
+SEA_ALT: Annotated[Any, "m"] = 0
 
 
-@default_units(h=ureg.meter)
-def temperature(h: Any) -> pint.Quantity:
+@impunity
+def temperature(h: Annotated[Any, "m"]) -> Annotated[Any, "K"]:
     """Temperature of ISA atmosphere
 
     :param h: the altitude (by default in meters), :math:`0 < h < 84852`
@@ -31,15 +41,18 @@ def temperature(h: Any) -> pint.Quantity:
     :return: the temperature (in K)
 
     """
-    temp: pint.Quantity[Any] = np.maximum(
-        Q_(288.15, "K") - Q_(0.0065, "K/m") * h,
+
+    temp_0: Annotated[Any, "K"] = 288.15
+    c: Annotated[Any, "K/m"] = 0.0065
+    temp: Annotated[Any, "K"] = np.maximum(
+        temp_0 - c * h,
         STRATOSPHERE_TEMP,
     )
     return temp
 
 
-@default_units(h=ureg.meter)
-def density(h: Any) -> pint.Quantity:
+@impunity
+def density(h: Annotated[Any, "m"]) -> Annotated[Any, "kg * m^-3"]:
     """Density of ISA atmosphere
 
     :param h: the altitude (by default in meters), :math:`0 < h < 84852`
@@ -48,17 +61,20 @@ def density(h: Any) -> pint.Quantity:
     :return: the density :math:`\\rho`, in kg/m3
 
     """
-    temp = temperature(h)
-    density_troposphere = RHO_0 * (temp / Q_(288.15, "K")) ** 4.256848
-    delta = np.maximum(Q_(0, "m"), h - Q_(11000, "m"))
-    density: pint.Quantity = density_troposphere * np.exp(
-        -delta / Q_(6341.5522, "m")
+    temp: Annotated[Any, "K"] = temperature(h)
+    temp_0: Annotated[Any, "K"] = 288.15
+    density_troposphere: Annotated[Any, "kg * m^-3"] = (
+        RHO_0 * (temp / temp_0) ** 4.256848
+    )
+    delta: Annotated[Any, "dimensionless"] = np.maximum(0, h - H_TROP)
+    density: Annotated[Any, "kg * m^-3"] = density_troposphere * np.exp(
+        -delta / 6341.5522
     )
     return density
 
 
-@default_units(h=ureg.meter)
-def pressure(h: Any) -> pint.Quantity:
+@impunity
+def pressure(h: Annotated[Any, "m"]) -> Annotated[Any, "Pa"]:
     """Pressure of ISA atmosphere
 
     :param h: the altitude (by default in meters), :math:`0 < h < 84852`
@@ -67,11 +83,11 @@ def pressure(h: Any) -> pint.Quantity:
     :return: the pressure, in Pa
 
     """
-    temp = temperature(h)
-    temp_0 = temperature(Q_(0, "m"))
-    delta = np.maximum(Q_(0, "m"), h - H_TROP)
+    temp: Annotated[Any, "K"] = temperature(h)
+    temp_0: Annotated[Any, "K"] = temperature(SEA_ALT)
+    delta: Annotated[Any, "dimensionless"] = np.maximum(0, h - H_TROP)
 
-    press: pint.Quantity = np.where(
+    press: Annotated[Any, "Pa"] = np.where(
         h < H_TROP,
         P_0 * (temp / temp_0) ** (-G_0 / (BETA_T * R)),
         TROPOPAUSE_PRESS * np.exp(-G_0 / (R * STRATOSPHERE_TEMP) * delta),
@@ -79,8 +95,14 @@ def pressure(h: Any) -> pint.Quantity:
     return press
 
 
-@default_units(h=ureg.meter)
-def atmosphere(h: Any) -> Tuple[pint.Quantity, pint.Quantity, pint.Quantity]:
+@impunity
+def atmosphere(
+    h: Annotated[Any, "m"]
+) -> Tuple[
+    Annotated[Any, "Pa"],
+    Annotated[Any, "kg * m^-3"],
+    Annotated[Any, "K"],
+]:
     """Pressure of ISA atmosphere
 
     :param h: the altitude (by default in meters), :math:`0 < h < 84852`
@@ -89,17 +111,20 @@ def atmosphere(h: Any) -> Tuple[pint.Quantity, pint.Quantity, pint.Quantity]:
     :return: a tuple (pressure, density, temperature)
 
     """
-    temp: pint.Quantity = np.maximum(
-        Q_(288.15, "K") - Q_(0.0065, "K/m") * h,
+    temp: Annotated[Any, "K"] = np.maximum(
+        288.15 - 0.0065 * h,
         STRATOSPHERE_TEMP,
     )
-    density_troposphere = RHO_0 * (temp / Q_(288.15, "K")) ** 4.256848
-    delta = np.maximum(Q_(0, "m"), h - Q_(11000, "m"))
-    den: pint.Quantity = density_troposphere * np.exp(
-        -delta / Q_(6341.5522, "m")
+    temp_0: Annotated[Any, "K"] = temperature(SEA_ALT)
+
+    density_troposphere: Annotated[Any, "kg * m^-3"] = (
+        RHO_0 * (temp / temp_0) ** 4.256848
     )
-    temp_0 = temperature(Q_(0, "m"))
-    press: pint.Quantity = np.where(
+    delta: Annotated[Any, "dimensionless"] = np.maximum(0, h - 11000)
+    den: Annotated[Any, "kg * m^-3"] = density_troposphere * np.exp(
+        -delta / 6341.5522
+    )
+    press: Annotated[Any, "Pa"] = np.where(
         h < H_TROP,
         P_0 * (temp / temp_0) ** (-G_0 / (BETA_T * R)),
         TROPOPAUSE_PRESS * np.exp(-G_0 / (R * STRATOSPHERE_TEMP) * delta),
@@ -107,8 +132,8 @@ def atmosphere(h: Any) -> Tuple[pint.Quantity, pint.Quantity, pint.Quantity]:
     return press, den, temp
 
 
-@default_units(h=ureg.meter)
-def sound_speed(h: Any) -> pint.Quantity:
+@impunity
+def sound_speed(h: Annotated[Any, "m"]) -> Annotated[Any, "m/s"]:
     """Speed of sound in ISA atmosphere
 
     :param h: the altitude (by default in meters), :math:`0 < h < 84852`
@@ -117,6 +142,6 @@ def sound_speed(h: Any) -> pint.Quantity:
     :return: the speed of sound :math:`a`, in m/s
 
     """
-    temp = temperature(h)
-    a = np.sqrt(GAMMA * R * temp)
+    temp: Annotated[Any, "K"] = temperature(h)
+    a: Annotated[Any, "m/s"] = np.sqrt(GAMMA * R * temp)
     return a

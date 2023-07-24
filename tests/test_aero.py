@@ -1,46 +1,125 @@
+from __future__ import annotations
+
+import unittest
+
+from impunity import impunity
+from pitot import aero, isa
+from typing_extensions import Annotated
+
 import numpy as np
-import pytest
-
-from pitot import aero
+import numpy.typing as npt
 
 
-def test_aero() -> None:
+class Aero(unittest.TestCase):
+    @impunity
+    def test_mach2tas(self) -> None:
+        raised = False
+        try:
+            altitude: Annotated[npt.NDArray[np.int64], "m"]
+            altitude = np.array([0, 1000])
 
-    # https://fr.wikipedia.org/wiki/Nombre_de_Mach
-    r1 = aero.mach2tas(1, [0, 1000])
-    assert r1.to("m/s").m == pytest.approx([340.3, 336.4], rel=1e-2)
+            result: Annotated[npt.NDArray[np.float64], "m/s"]
+            result = aero.mach2tas(1, altitude)
 
-    # https://en.wikipedia.org/wiki/Mach_number
-    r2 = aero.mach2tas([0.8, 1.2, 5, 10], 0)
-    assert r2.to("kts").m == pytest.approx([530, 794, 3308, 6615], rel=1e-2)
+            expected: Annotated[npt.NDArray[np.float64], "m/s"]
+            expected = np.array([340.3, 336.4])
 
-    r3 = aero.tas2mach(r2, 0)
-    assert r3.m == pytest.approx([0.8, 1.2, 5, 10])
+            np.testing.assert_allclose(result, expected, rtol=1e-2)
+        except AssertionError:
+            raised = True
 
-    # https://en.wikipedia.org/wiki/Airspeed
-    # For example, an aircraft flying at 15,000 feet (4,572 m) in the
-    # international standard atmosphere with an IAS of 100 knots (190 km/h), is
-    # actually flying at 126 knots (233 km/h) TAS.
+        self.assertFalse(raised)
 
-    r4 = aero.cas2tas(100, 15_000)
-    assert r4.m == pytest.approx(126, rel=1e-2)
+    @impunity
+    def test_mach2tas_part2(self) -> None:
+        raised = False
+        try:
+            # https://en.wikipedia.org/wiki/Mach_number
+            mach: Annotated[npt.NDArray[np.float64], "dimensionless"]
+            mach = np.array([0.8, 1.2, 5, 10])
 
-    r5 = aero.tas2cas(126, 15_000)
-    assert r5.m == pytest.approx(100, rel=1e-2)
+            result = aero.mach2tas(mach, isa.SEA_ALT)
 
-    # https://en.wikipedia.org/wiki/Airspeed
-    # With EAS constant, true airspeed increases as aircraft altitude increases.
-    # This is because air density decreases with higher altitude.
-    r6 = aero.eas2tas(300, [0, 1000, 2000, 5000, 10000])
-    assert np.all(r6.m >= 300)
+            expected: Annotated[npt.NDArray[np.float64], "kts"]
+            expected = np.array([530, 794, 3308, 6615])
 
-    r7 = aero.tas2eas(300, [0, 1000, 2000, 5000, 10000])
-    assert np.all(r7.m <= 300)
+            np.testing.assert_allclose(result, expected, rtol=1e-2)
+        except AssertionError:
+            raised = True
 
-    r8 = aero.mach2cas([0.8, 1.2, 5, 10], 0)
-    assert r8.m == pytest.approx(
-        aero.tas2cas(aero.mach2tas([0.8, 1.2, 5, 10], 0), 0).m, rel=1e-2
-    )
+        self.assertFalse(raised)
 
-    r9 = aero.cas2mach(r8, 0)
-    assert r9.m == pytest.approx([0.8, 1.2, 5, 10], rel=1e-2)
+    @impunity
+    def test_tas2mach(self) -> None:
+        raised = False
+        try:
+            speed: Annotated[npt.NDArray[np.float64], "kts"]
+            speed = np.array([530, 794, 3308, 6615])
+
+            result = aero.tas2mach(speed, 0)
+
+            expected: Annotated[npt.NDArray[np.float64], "kts"]
+            expected = np.array([0.8, 1.2, 5, 10])
+
+            np.testing.assert_allclose(result, expected, rtol=1e-2)
+        except AssertionError:
+            raised = True
+
+        self.assertFalse(raised)
+
+    @impunity
+    def test_cas2tas(self) -> None:
+        # https://en.wikipedia.org/wiki/Airspeed
+        # For example, an aircraft flying at 15,000 feet (4,572 m) in the
+        # international standard atmosphere with an IAS of 100 knots
+        # (190 km/h), is actually flying at 126 knots (233 km/h) TAS.
+
+        result = aero.cas2tas(100, 15_000)
+        self.assertAlmostEqual(result, 125.790, places=1)
+
+    @impunity
+    def test_cas2tas_part2(self) -> None:
+        result = aero.tas2cas(126, 15_000)
+        self.assertAlmostEqual(result, 100.167, delta=1e-2)
+
+    @impunity
+    def test_cas2tas_part3(self) -> None:
+        result = aero.eas2tas(300, np.array([0, 1000, 2000, 5000, 10000]))
+        assert np.all(result >= 300)
+
+    @impunity
+    def test_cas2tas_part4(self) -> None:
+        result = aero.tas2eas(300, np.array([0, 1000, 2000, 5000, 10000]))
+        assert np.all(result <= 300)
+
+    @impunity
+    def test_cas2tas_part5(self) -> None:
+        raised = False
+        try:
+            result = aero.mach2cas(np.array([0.8, 1.2, 5, 10]), 0)
+            expected = aero.mach2tas(np.array([0.8, 1.2, 5, 10]), 0)
+            expected = aero.tas2cas(expected, 0)
+            np.testing.assert_allclose(result, expected, rtol=1e-2)
+        except AssertionError:
+            raised = True
+
+        self.assertFalse(raised)
+
+    @impunity
+    def test_cas2tas_part6(self) -> None:
+        raised = False
+        try:
+            mach = np.array([0.8, 1.2, 5, 10])
+
+            cas = aero.mach2cas(mach, 0)
+            result = aero.cas2mach(cas, 0)
+
+            np.testing.assert_allclose(result, mach, rtol=1e-2)
+        except AssertionError:
+            raised = True
+
+        self.assertFalse(raised)
+
+
+if __name__ == "__main__":
+    unittest.main()

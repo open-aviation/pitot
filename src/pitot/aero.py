@@ -1,10 +1,11 @@
 from typing import Any
 
-import numpy as np
-import pint
+from impunity import impunity
+from typing_extensions import Annotated
 
-from .isa import P_0, RHO_0, atmosphere, density, sound_speed
-from .wrapper import default_units
+import numpy as np
+
+from . import isa
 
 __all__ = [
     "tas2mach",
@@ -18,90 +19,113 @@ __all__ = [
 ]
 
 
-@default_units(tas="kts", h="ft")
-def tas2mach(tas: Any, h: Any) -> pint.Quantity:
+@impunity
+def tas2mach(
+    tas: Annotated[Any, "kts"], h: Annotated[Any, "ft"]
+) -> Annotated[Any, "dimensionless"]:
     """
     :param tas: True Air Speed, (by default in kts)
     :param h: altitude, (by default in ft)
 
     :return: Mach number (dimensionless)
     """
-    a = sound_speed(h)
-    M = tas / a
-    return M.to("dimensionless")
+    a = isa.sound_speed(h)
+    M: Annotated[Any, "dimensionless"] = tas / a
+    return M
 
 
-@default_units(M="dimensionless", h="ft")
-def mach2tas(M: Any, h: Any) -> pint.Quantity:
+@impunity
+def mach2tas(
+    M: Annotated[Any, "dimensionless"], h: Annotated[Any, "ft"]
+) -> Annotated[Any, "kts"]:
     """
     :param M: Mach number (dimensionless)
     :param h: altitude, (by default in ft)
 
     :param tas: True Air Speed, (in kts)
     """
-    a = sound_speed(h)
-    tas = M * a
-    return tas.to("kts")
+    a = isa.sound_speed(h)
+    tas: Annotated[Any, "kts"] = M * a
+    return tas
 
 
-@default_units(eas="kts", h="ft")
-def eas2tas(eas: Any, h: Any) -> pint.Quantity:
+@impunity
+def eas2tas(
+    eas: Annotated[Any, "kts"], h: Annotated[Any, "ft"]
+) -> Annotated[Any, "kts"]:
     """
     :param eas: Equivalent Air Speed, (by default in kts)
     :param h: altitude, (by default in ft)
 
     :return: True Air Speed, (in kts)
     """
-    rho = density(h)
-    tas = eas * np.sqrt(RHO_0 / rho)
-    return tas.to("kts")
+    rho = isa.density(h)
+    tas: Annotated[Any, "kts"] = eas * np.sqrt(isa.RHO_0 / rho)
+    return tas
 
 
-@default_units(tas="kts", h="ft")
-def tas2eas(tas: Any, h: Any) -> pint.Quantity:
+@impunity
+def tas2eas(
+    tas: Annotated[Any, "kts"], h: Annotated[Any, "ft"]
+) -> Annotated[Any, "kts"]:
     """
     :param tas: True Air Speed, (by default in kts)
     :param h: altitude, (by default in ft)
 
     :return: Equivalent Air Speed, (in kts)
     """
-    rho = density(h)
-    eas = tas * np.sqrt(rho / RHO_0)
-    return eas.to("kts")
+    rho = isa.density(h)
+    eas: Annotated[Any, "kts"] = tas * np.sqrt(rho / isa.RHO_0)
+    return eas
 
 
-@default_units(cas="kts", h="ft")
-def cas2tas(cas: Any, h: Any) -> pint.Quantity:
+@impunity
+def cas2tas(
+    cas: Annotated[Any, "kts"], h: Annotated[Any, "ft"]
+) -> Annotated[Any, "kts"]:
     """
     :param cas: Computed Air Speed, (by default in kts)
     :param h: altitude, (by default in ft)
 
     :return: True Air Speed, (in kts)
     """
-    p, rho, _temp = atmosphere(h)
-    qdyn = P_0 * ((1.0 + RHO_0 * cas * cas / (7.0 * P_0)) ** 3.5 - 1.0)
-    tas = np.sqrt(7.0 * p / rho * ((1.0 + qdyn / p) ** (2.0 / 7.0) - 1.0))
+    p, rho, _temp = isa.atmosphere(h)
+    qdyn: Annotated[Any, "Pa"] = isa.P_0 * (
+        (1.0 + isa.RHO_0 * cas * cas / (7.0 * isa.P_0)) ** 3.5 - 1.0
+    )
+    tas: Annotated[Any, "m/s"] = np.sqrt(
+        7.0 * p / rho * ((1.0 + qdyn / p) ** (2.0 / 7.0) - 1.0)
+    )
     tas = np.where(cas < 0, -1 * tas, tas)
-    return tas.to("kts")
+    return tas
 
 
-@default_units(tas="kts", h="ft")
-def tas2cas(tas: Any, h: Any) -> pint.Quantity:
+@impunity
+def tas2cas(
+    tas: Annotated[Any, "kts"], h: Annotated[Any, "ft"]
+) -> Annotated[Any, "kts"]:
     """
     :param tas: True Air Speed, (by default in kts)
     :param h: altitude, (by default in ft)
 
     :return: Computed Air Speed, (in kts)
     """
-    p, rho, _temp = atmosphere(h)
+    p, rho, _temp = isa.atmosphere(h)
     qdyn = p * ((1.0 + rho * tas * tas / (7.0 * p)) ** 3.5 - 1.0)
-    cas = np.sqrt(7.0 * P_0 / RHO_0 * ((qdyn / P_0 + 1.0) ** (2.0 / 7.0) - 1.0))
+    cas: Annotated[Any, "m/s"] = np.sqrt(
+        7.0
+        * isa.P_0
+        / isa.RHO_0
+        * ((qdyn / isa.P_0 + 1.0) ** (2.0 / 7.0) - 1.0)
+    )
     cas = np.where(tas < 0, -1 * cas, cas)
-    return cas.to("kts")
+    return cas
 
 
-@default_units(M="dimensionless", h="ft")
-def mach2cas(M: Any, h: Any) -> pint.Quantity:
+@impunity
+def mach2cas(
+    M: Annotated[Any, "dimensionless"], h: Annotated[Any, "ft"]
+) -> Annotated[Any, "kts"]:
     """
     :param M: Mach number
     :param h: altitude, (by default in ft)
@@ -110,11 +134,13 @@ def mach2cas(M: Any, h: Any) -> pint.Quantity:
     """
     tas = mach2tas(M, h)
     cas = tas2cas(tas, h)
-    return cas.to("kts")
+    return cas
 
 
-@default_units(cas="kts", h="ft")
-def cas2mach(cas: Any, h: Any) -> pint.Quantity:
+@impunity
+def cas2mach(
+    cas: Annotated[Any, "kts"], h: Annotated[Any, "ft"]
+) -> Annotated[Any, "dimensionless"]:
     """
     :param cas: Computed Air Speed, (by default in kts)
     :param h: altitude, (by default in ft)
@@ -123,4 +149,4 @@ def cas2mach(cas: Any, h: Any) -> pint.Quantity:
     """
     tas = cas2tas(cas, h)
     M = tas2mach(tas, h)
-    return M.to("dimensionless")
+    return M

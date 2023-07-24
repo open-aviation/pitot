@@ -5,23 +5,23 @@ All angles are in degrees, all distances are in meter.
 """
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, List, Tuple
 
-import pint
+from impunity import impunity
+from typing_extensions import Annotated
+
 from pyproj import Geod
 
-from . import ureg
-from .wrapper import default_units
 
-
+@impunity
 def distance(
-    lat1: float,
-    lon1: float,
-    lat2: float,
-    lon2: float,
-    *args: Any,
-    **kwargs: Any,
-) -> Any:
+    lat1: Annotated[Any, "degree"],
+    lon1: Annotated[Any, "degree"],
+    lat2: Annotated[Any, "degree"],
+    lon2: Annotated[Any, "degree"],
+    *args: Annotated[Any, "dimensionless"],
+    **kwargs: Annotated[Any, "dimensionless"],
+) -> Annotated[Any, "m"]:
     """Computes the distance(s) between two points (or arrays of points).
 
     :param lat1: latitude value(s)
@@ -33,18 +33,20 @@ def distance(
 
     """
     geod = Geod(ellps="WGS84")
-    angle1, angle2, dist1 = geod.inv(lon1, lat1, lon2, lat2, *args, **kwargs)
-    return dist1 * ureg.m
+    dist1: Annotated[Any, "m"]
+    _, _, dist1 = geod.inv(lon1, lat1, lon2, lat2, *args, **kwargs)
+    return dist1
 
 
+@impunity
 def bearing(
-    lat1: float,
-    lon1: float,
-    lat2: float,
-    lon2: float,
-    *args: Any,
-    **kwargs: Any,
-) -> Any:
+    lat1: Annotated[Any, "degree"],
+    lon1: Annotated[Any, "degree"],
+    lat2: Annotated[Any, "degree"],
+    lon2: Annotated[Any, "degree"],
+    *args: Annotated[Any, "dimensionless"],
+    **kwargs: Annotated[Any, "dimensionless"],
+) -> Annotated[Any, "degree"]:
     """Computes the distance(s) between two points (or arrays of points).
 
     :param lat1: latitude value(s)
@@ -55,19 +57,24 @@ def bearing(
     :return: the bearing angle, in degrees, from the first point to the second
     """
     geod = Geod(ellps="WGS84")
-    angle1, angle2, dist1 = geod.inv(lon1, lat1, lon2, lat2, *args, **kwargs)
+    angle1: Annotated[Any, "degree"]
+    angle1, _, _ = geod.inv(lon1, lat1, lon2, lat2, *args, **kwargs)
     return angle1
 
 
-@default_units(distance="m")
+@impunity
 def destination(
-    lat: float,
-    lon: float,
-    bearing: float,
-    distance: pint.Quantity,
-    *args: Any,
-    **kwargs: Any,
-) -> Any:
+    lat: Annotated[Any, "degree"],
+    lon: Annotated[Any, "degree"],
+    bearing: Annotated[Any, "degree"],
+    distance: Annotated[Any, "m"],
+    *args: Annotated[Any, "dimensionless"],
+    **kwargs: Annotated[Any, "dimensionless"],
+) -> Tuple[
+    Annotated[Any, "degree"],
+    Annotated[Any, "degree"],
+    Annotated[Any, "degree"],
+]:
     """Computes the point you reach from a set of coordinates, moving in a
     given direction for a given distance.
 
@@ -80,20 +87,22 @@ def destination(
         from the destination point back to the origin, all in degrees.
     """
     geod = Geod(ellps="WGS84")
-    lon_, lat_, back_ = geod.fwd(
-        lon, lat, bearing, distance.to("m").m, *args, **kwargs
-    )
+    lon_: Annotated[Any, "degree"]
+    lat_: Annotated[Any, "degree"]
+    back_: Annotated[Any, "degree"]
+    lon_, lat_, back_ = geod.fwd(lon, lat, bearing, distance, *args, **kwargs)
     return lat_, lon_, back_
 
 
+@impunity
 def greatcircle(
-    lat1: float,
-    lon1: float,
-    lat2: float,
-    lon2: float,
-    *args: Any,
-    **kwargs: Any,
-) -> Any:
+    lat1: Annotated[Any, "degree"],
+    lon1: Annotated[Any, "degree"],
+    lat2: Annotated[Any, "degree"],
+    lon2: Annotated[Any, "degree"],
+    *args: Annotated[Any, "dimensionless"],
+    **kwargs: Annotated[Any, "dimensionless"],
+) -> List[Annotated[Any, "degree"]]:
     """Computes a list of points making the great circle between two points.
 
     :param lat1: latitude value
