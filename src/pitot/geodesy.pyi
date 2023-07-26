@@ -56,6 +56,21 @@ def destination(
 ]: ...
 @overload
 def destination(
+    lon: Annotated[float | Sequence[float] | npt.NDArray[np.float64], "degree"],
+    lat: Annotated[float | Sequence[float] | npt.NDArray[np.float64], "degree"],
+    bearing: Annotated[
+        float | Sequence[float] | npt.NDArray[np.float64], "degree"
+    ],
+    distance: Annotated[Sequence[float] | npt.NDArray[np.float64], "m"],
+    *args: Any,
+    **kwargs: Any,
+) -> tuple[
+    Annotated[npt.NDArray[np.float64], "degree"],
+    Annotated[npt.NDArray[np.float64], "degree"],
+    Annotated[npt.NDArray[np.float64], "degree"],
+]: ...
+@overload
+def destination(
     lon: Annotated[Sequence[float] | npt.NDArray[np.float64], "degree"],
     lat: Annotated[Sequence[float] | npt.NDArray[np.float64], "degree"],
     bearing: Annotated[
