@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pitot"
-version = "0.3.0"
+version = "0.3.1"
 description = "Toolbox for aeronautic units and conversions"
 authors = ["Xavier Olive <git@xoolive.org>", "Junzi Sun <junzisun@gmail.com>"]
 license = "MIT"
@@ -31,17 +31,16 @@ numpy = ">=1.23.0"
 pandas = ">=1.4.3"
 typing-extensions = ">=4.3.0"
 pyproj = ">=3.3.1"
-impunity = ">=1.0.2"
+impunity = ">=1.0.3"
 # impunity = { path = "../impunity", develop = true }
 
 [tool.poetry.group.dev.dependencies]
 mypy = ">=0.991"
-isort = ">=5.10.1"
 black = ">=22.12.0"
 pytest = ">=7.1.2"
 pytest-cov = ">=4.0.0"
 pre-commit = ">=2.20.0"
-ruff = "^0.0.253"
+ruff = ">=0.0.253"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -49,7 +48,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.black]
 line-length = 80
-target_version = ['py37', 'py38', 'py39']
+target_version = ['py38', 'py39', 'py310', 'py311']
 include = '\.pyi?$'
 exclude = '''
 /(
@@ -77,9 +76,6 @@ target-version = "py38"
 
 [tool.ruff.isort]
 known-first-party = ["numpy", "pandas", "pyproj", "shapely"]
-
-# [tool.isort]
-# skip = ["*.pyi"]
 
 [tool.mypy]
 python_version = 3.8
