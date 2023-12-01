@@ -35,12 +35,11 @@ impunity = ">=1.0.3"
 # impunity = { path = "../impunity", develop = true }
 
 [tool.poetry.group.dev.dependencies]
+pre-commit = ">=2.20.0"
 mypy = ">=0.991"
-black = ">=22.12.0"
+ruff = ">=0.0.253"
 pytest = ">=7.1.2"
 pytest-cov = ">=4.0.0"
-pre-commit = ">=2.20.0"
-ruff = ">=0.0.253"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
