@@ -97,7 +97,7 @@ def pressure(h: Annotated[Any, "m"]) -> Annotated[Any, "Pa"]:
 
 @impunity
 def atmosphere(
-    h: Annotated[Any, "m"]
+    h: Annotated[Any, "m"],
 ) -> Tuple[
     Annotated[Any, "Pa"],
     Annotated[Any, "kg * m^-3"],
