@@ -61,7 +61,7 @@ exclude = '''
 '''
 
 [tool.ruff]
-select = [
+lint.select = [
   "E", "W",  # pycodestyle
   "F",  # pyflakes
   "I",  # isort
@@ -73,7 +73,7 @@ select = [
 line-length = 80
 target-version = "py38"
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["numpy", "pandas", "pyproj", "shapely"]
 
 [tool.mypy]

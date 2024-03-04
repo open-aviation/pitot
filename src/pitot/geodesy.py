@@ -3,6 +3,7 @@ This module contains a set of geodesy functions wrapped around all what is
 available in the `pyproj <https://pyproj4.github.io/pyproj/stable/>`_ library.
 All angles are in degrees, all distances are in meter.
 """
+
 from __future__ import annotations
 
 from typing import Any, List, Tuple
