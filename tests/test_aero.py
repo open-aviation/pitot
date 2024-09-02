@@ -3,11 +3,11 @@ from __future__ import annotations
 import unittest
 
 from impunity import impunity
-from pitot import aero, isa
 from typing_extensions import Annotated
 
 import numpy as np
 import numpy.typing as npt
+from pitot import aero, isa
 
 
 class Aero(unittest.TestCase):

@@ -2,12 +2,12 @@ import unittest
 from pathlib import Path
 
 from impunity import impunity
-from pitot import isa
 from typing_extensions import Annotated
 
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
+from pitot import isa
 
 isa_table = pd.read_fwf(
     Path(__file__).parent / "isa_table.txt", header=[0, 1]

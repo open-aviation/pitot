@@ -2,10 +2,10 @@ import unittest
 from typing import Any
 
 from impunity import impunity
-from pitot.geodesy import bearing, destination, distance, greatcircle
 from typing_extensions import Annotated
 
 import numpy as np
+from pitot.geodesy import bearing, destination, distance, greatcircle
 
 zero: Annotated[int, "dimensionless"] = 0
 boop: Annotated[int, "dimensionless"] = 0
