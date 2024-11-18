@@ -1,8 +1,11 @@
-[tool.poetry]
+[project]
 name = "pitot"
-version = "0.3.1"
+version = "0.3.2"
 description = "Toolbox for aeronautic units and conversions"
-authors = ["Xavier Olive <git@xoolive.org>", "Junzi Sun <junzisun@gmail.com>"]
+authors = [
+  { name = "Xavier Olive", email = "git@xoolive.org" },
+  { name = "Junzi Sun", email = "j.sun-1@tudelft.nl" },
+]
 license = "MIT"
 readme = "readme.md"
 classifiers = [
@@ -20,64 +23,49 @@ classifiers = [
   "Programming Language :: Python :: 3.10",
   "Typing :: Typed",
 ]
-include = [
-  "license.txt",
-  "py.typed"
+requires-python = ">=3.9"
+dependencies = [
+  "impunity>=1.0.5",
+  "numpy>=2.0.2; python_version<'3.10'",
+  "numpy>=2.1.3; python_version>='3.10'",
+  "pandas>=2.2.3",
+  "typing-extensions>=4.12.2",
+  "pyproj<3.7.1; python_version<'3.10'",
+  "pyproj>=3.7.0; python_version>='3.10'",
 ]
 
-[tool.poetry.dependencies]
-python = "^3.9"
-numpy = ">=1.23.0"
-pandas = ">=1.4.3"
-typing-extensions = ">=4.3.0"
-pyproj = ">=3.3.1"
-impunity = ">=1.0.3"
-# impunity = { path = "../impunity", develop = true }
-
-[tool.poetry.group.dev.dependencies]
-pre-commit = ">=2.20.0"
-mypy = ">=0.991"
-ruff = ">=0.0.253"
-pytest = ">=7.1.2"
-pytest-cov = ">=4.0.0"
+[tool.uv]
+dev-dependencies = [
+  "mypy>=1.13.0",
+  "pre-commit>=4.0.1",
+  "pytest>=8.3.3",
+  "pytest-cov>=6.0.0",
+  "ruff>=0.7.2",
+]
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.black]
-line-length = 80
-target_version = ['py38', 'py39', 'py310', 'py311']
-include = '\.pyi?$'
-exclude = '''
-/(
-    __pycache__
-  | \.git
-  | \.mypy_cache
-  | \.ipynb_checkpoints
-  | build
-  | dist
-)/
-'''
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.ruff]
 lint.select = [
-  "E", "W",  # pycodestyle
-  "F",  # pyflakes
-  "I",  # isort
-  "NPY",  # numpy
+  "E",
+  "W",   # pycodestyle
+  "F",   # pyflakes
+  "I",   # isort
+  "NPY", # numpy
   # "PD",  # pandas
   "DTZ", # flake8-datetimez
-  "RUF"
+  "RUF",
 ]
 line-length = 80
-target-version = "py38"
+target-version = "py39"
 
 [tool.ruff.lint.isort]
 known-first-party = ["numpy", "pandas", "pyproj", "shapely"]
 
 [tool.mypy]
-python_version = 3.8
+python_version = 3.9
 platform = "posix"
 
 color_output = true
@@ -95,8 +83,6 @@ warn_unused_ignores = true
 
 [tool.pytest.ini_options]
 addopts = "--log-level=INFO --color=yes --doctest-modules --doctest-report ndiff"
-filterwarnings = [
-  "ignore:.*unit of the quantity is strip.*:"
-]
+filterwarnings = ["ignore:.*unit of the quantity is strip.*:"]
 testpaths = ["tests", "src"]
 doctest_optionflags = ["NORMALIZE_WHITESPACE", "ELLIPSIS", "NUMBER"]
