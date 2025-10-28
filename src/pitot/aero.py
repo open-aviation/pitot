@@ -8,14 +8,14 @@ import numpy as np
 from . import isa
 
 __all__ = [
-    "tas2mach",
-    "mach2tas",
-    "eas2tas",
-    "tas2eas",
-    "cas2tas",
-    "tas2cas",
-    "mach2cas",
     "cas2mach",
+    "cas2tas",
+    "eas2tas",
+    "mach2cas",
+    "mach2tas",
+    "tas2cas",
+    "tas2eas",
+    "tas2mach",
 ]
 
 

@@ -5,7 +5,7 @@ from typing_extensions import Annotated
 
 import numpy as np
 
-__all__ = ["temperature", "density", "pressure", "sound_speed"]
+__all__ = ["density", "pressure", "sound_speed", "temperature"]
 
 m = Annotated[Any, "meters"]
 
