@@ -35,7 +35,7 @@ pip install pitot
 ### Development version
 
 ```sh
-poetry install
+uv sync --dev
 ```
 
 ## Basic usage
